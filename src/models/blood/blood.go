@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"context"
+
+	"github.com/Ceald1/HTB-TUI/src/format"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/bubbles/spinner"
-	"github.com/Ceald1/HTB-TUI/src/format"
 	HTB "github.com/gubarz/gohtb"
-	"context"
+	"github.com/gubarz/gohtb/services/seasons"
 )
 
 type errMsg error
@@ -26,6 +28,7 @@ type model struct {
 	err          error
 	MachineBlood Blood
 	HTBClient    HTB.Client
+	Machine		 seasons.ActiveMachineResponse
 }
 
 type Blood struct {
@@ -40,29 +43,24 @@ func InitialModel(HTBClient *HTB.Client) model {
 }
 
 func (m model) Init() tea.Cmd {
+	machine := SeasonalMachine(m.HTBClient)
+	m.Machine = machine
 	return tea.Batch(
 		m.spinner.Tick,
-		bloodTaskCmd(m.HTBClient), // Start the periodic check
+		bloodTaskCmd(m.HTBClient, m.Machine), // Start the periodic check
 	)
 }
 
-func bloodTaskCmd(client HTB.Client) tea.Cmd {
+func bloodTaskCmd(client HTB.Client, machine seasons.ActiveMachineResponse) tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
-		machine, err := client.Seasons.ActiveMachine(ctx)
-		if err != nil {
-			fmt.Println("error getting current machine!")
-			fmt.Println(machine.Data)
-			panic(err)
-			return bloodMsg{Err: err}
-		}
+		
 		machineID := machine.Data.Id
 		activeMachineInfo := client.Machines.Machine(machineID)
 		machineInfo, err := activeMachineInfo.Info(ctx)
 		if err != nil {
 			fmt.Println("error getting Blood INFO")
 			panic(err)
-			return bloodMsg{Err: err}
 		}
 		root := machineInfo.Data.RootBlood.User.Name
 		user := machineInfo.Data.UserBlood.User.Name
@@ -70,12 +68,17 @@ func bloodTaskCmd(client HTB.Client) tea.Cmd {
 	}
 }
 
-// func every3SecondsCmd() tea.Cmd {
-// 	return func() tea.Msg {
-// 		time.Sleep(3 * time.Second)
-// 		return nil // triggers Update so we can re-run BloodTask
-// 	}
-// }
+func SeasonalMachine(client HTB.Client) (seasons.ActiveMachineResponse) {
+	ctx := context.Background()
+	machine, err := client.Seasons.ActiveMachine(ctx)
+		if err != nil {
+			fmt.Println("error getting current machine!")
+			fmt.Println(machine.Data)
+			panic(err)
+		}
+	return machine
+}
+
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -104,12 +107,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quit = true
 			return m, tea.Quit
 		}
-		// Schedule next task in 3 seconds
+		// Schedule next task in 30 seconds
 		return m, tea.Batch(
 			m.spinner.Tick,
 			func() tea.Msg {
 				time.Sleep(30 * time.Second)
-				return bloodTaskCmd(m.HTBClient)()
+				return bloodTaskCmd(m.HTBClient, m.Machine)()
 			},
 		)
 
