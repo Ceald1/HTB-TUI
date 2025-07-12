@@ -2,128 +2,145 @@ package blood
 
 import (
 	"fmt"
-	"log"
-	"math/rand"
-	"os"
 	"time"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/Ceald1/HTB-TUI/src/format"
 	HTB "github.com/gubarz/gohtb"
-	style "github.com/Ceald1/HTB-TUI/src"
+	"context"
 )
 
-var (
-	helpStyle = lipgloss.NewStyle().Foreground(style.TextYellow).Render
-	mainStyle = lipgloss.NewStyle().Margin(1)
-)
+type errMsg error
 
-
-func Run() {
-		var (
-		opts       []tea.ProgramOption
-	)
-
-
-
-
-	p := tea.NewProgram(newModel(), opts...)
-	if _, err := p.Run(); err != nil {
-		fmt.Println("Error starting Bubble Tea program:", err)
-		os.Exit(1)
-	}
-}
-
-type result struct {
-	duration time.Duration
-	emoji    string
+type bloodMsg struct {
+	User string
+	Root string
+	Err  error
 }
 
 type model struct {
-	spinner  spinner.Model
-	results  []result
-	quitting bool
+	spinner      spinner.Model
+	quit         bool
+	err          error
+	MachineBlood Blood
+	HTBClient    HTB.Client
 }
 
-func newModel() model {
-	const showLastResults = 5
+type Blood struct {
+	User string
+	Root string
+}
 
-	sp := spinner.New()
-	sp.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("206"))
-
-	return model{
-		spinner: sp,
-		results: make([]result, showLastResults),
-	}
+func InitialModel(HTBClient *HTB.Client) model {
+	s := spinner.New()
+	s.Spinner = spinner.Pulse
+	return model{spinner: s, HTBClient: *HTBClient}
 }
 
 func (m model) Init() tea.Cmd {
-	log.Println("Starting work...")
 	return tea.Batch(
 		m.spinner.Tick,
-		runPretendProcess,
+		bloodTaskCmd(m.HTBClient), // Start the periodic check
 	)
 }
 
+func bloodTaskCmd(client HTB.Client) tea.Cmd {
+	return func() tea.Msg {
+		ctx := context.Background()
+		machine, err := client.Seasons.ActiveMachine(ctx)
+		if err != nil {
+			fmt.Println("error getting current machine!")
+			fmt.Println(machine.Data)
+			panic(err)
+			return bloodMsg{Err: err}
+		}
+		machineID := machine.Data.Id
+		activeMachineInfo := client.Machines.Machine(machineID)
+		machineInfo, err := activeMachineInfo.Info(ctx)
+		if err != nil {
+			fmt.Println("error getting Blood INFO")
+			panic(err)
+			return bloodMsg{Err: err}
+		}
+		root := machineInfo.Data.RootBlood.User.Name
+		user := machineInfo.Data.UserBlood.User.Name
+		return bloodMsg{User: user, Root: root}
+	}
+}
+
+// func every3SecondsCmd() tea.Cmd {
+// 	return func() tea.Msg {
+// 		time.Sleep(3 * time.Second)
+// 		return nil // triggers Update so we can re-run BloodTask
+// 	}
+// }
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+
 	case tea.KeyMsg:
-		m.quitting = true
-		return m, tea.Quit
-	case spinner.TickMsg:
+		switch msg.String() {
+		case "q", "esc", "ctrl+c":
+			m.quit = true
+			return m, tea.Quit
+		default:
+			return m, nil
+		}
+
+	case errMsg:
+		m.err = msg
+		return m, nil
+
+	case bloodMsg:
+		if msg.Err != nil {
+			m.err = msg.Err
+			return m, nil
+		}
+		m.MachineBlood.User = msg.User
+		m.MachineBlood.Root = msg.Root
+		if len(msg.User) != 0 && len(msg.Root) != 0 {
+			m.quit = true
+			return m, tea.Quit
+		}
+		// Schedule next task in 3 seconds
+		return m, tea.Batch(
+			m.spinner.Tick,
+			func() tea.Msg {
+				time.Sleep(30 * time.Second)
+				return bloodTaskCmd(m.HTBClient)()
+			},
+		)
+
+	default:
 		var cmd tea.Cmd
 		m.spinner, cmd = m.spinner.Update(msg)
 		return m, cmd
-	case processFinishedMsg:
-		d := time.Duration(msg)
-		res := result{emoji: randomEmoji(), duration: d}
-		log.Printf("%s Job finished in %s", res.emoji, res.duration)
-		m.results = append(m.results[1:], res)
-		return m, runPretendProcess
-	default:
-		return m, nil
 	}
 }
 
 func (m model) View() string {
-	s := "\n" +
-		m.spinner.View() + " waiting blood...\n\n"
-
-	for _, res := range m.results {
-		if res.duration == 0 {
-			s += "........................\n"
-		} else {
-			s += fmt.Sprintf("%s Job finished in %s\n", res.emoji, res.duration)
-		}
+	if m.err != nil {
+		return m.err.Error()
 	}
-
-	s += helpStyle("\nPress any key to exit\n")
-
-	if m.quitting {
-		s += "\n"
+	var str string
+	redStyle := lipgloss.NewStyle().Foreground(format.Red)
+	if len(m.MachineBlood.User) < 1 && len(m.MachineBlood.Root) < 1 {
+		str = redStyle.Render(fmt.Sprintf("\n\n   %s Awaiting Bloods...press q to quit\n\n", m.spinner.View()))
+	} else {
+		str = redStyle.Render(fmt.Sprintf("\n\n   %s Awaiting Bloods...press q to quit\n\n user: %s\n root: %s", m.spinner.View(), m.MachineBlood.User, m.MachineBlood.Root))
 	}
-
-	return mainStyle.Render(s)
+	if m.quit {
+		return str + "\n"
+	}
+	return str
 }
 
-// processFinishedMsg is sent when a pretend process completes.
-type processFinishedMsg time.Duration
-
-// pretendProcess simulates a long-running process.
-func runPretendProcess() tea.Msg {
-	pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec
-	time.Sleep(pause)
-	return processFinishedMsg(pause)
-}
-var asciiRunes = func() []rune {
-    r := make([]rune, 128)
-    for i := 0; i < 128; i++ {
-        r[i] = rune(i)
-    }
-    return r
-}()
-
-func randomEmoji() string {
-	return string(asciiRunes[rand.Intn(len(asciiRunes))]) // nolint:gosec
+func Run(HTBClient *HTB.Client) (err error) {
+	p := tea.NewProgram(InitialModel(HTBClient))
+	if _, err = p.Run(); err != nil {
+		return err
+	}
+	return
 }

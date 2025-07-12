@@ -4,15 +4,17 @@ package src
 
 import (
 	"os"
-	BloodModel "github.com/Ceald1/HTB-TUI/src/modesl/blood"
+	BloodModel "github.com/Ceald1/HTB-TUI/src/models/blood"
 
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
+	"github.com/Ceald1/HTB-TUI/src/format"
 )
 
 // Initial TUI Prompt
 func API_Token() (instance *HTB.Client, err error){
+	
 	// creating HTB instance and set token
 	token := os.Getenv("HTB_TOKEN")
 	if len(token) > 1 {
@@ -20,8 +22,8 @@ func API_Token() (instance *HTB.Client, err error){
 		return
 	}
 
-	title := lipgloss.NewStyle().Foreground(TextTitle).Padding(1,1,1,1).Background(BaseBG).Render(`Please set the "HTB_TOKEN" environment variable to avoid going through this form`)
-	prompt := lipgloss.NewStyle().Foreground(TextDefault).Render("Enter your HTB Token > ")
+	title := lipgloss.NewStyle().Foreground(format.TextTitle).Padding(1,1,1,1).Background(format.BaseBG).Render(`Please set the "HTB_TOKEN" environment variable to avoid going through this form`)
+	prompt := lipgloss.NewStyle().Foreground(format.TextDefault).Render("Enter your HTB Token > ")
 	huh.NewInput().
 		Title(title).Prompt(prompt).
 		Value(&token).Run()
@@ -32,6 +34,6 @@ func API_Token() (instance *HTB.Client, err error){
 
 
 
-func BoxBlood() {
-	BloodModel.Run()
+func BoxBlood(HTBClient *HTB.Client) {
+	BloodModel.Run(HTBClient)
 }

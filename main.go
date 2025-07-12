@@ -6,10 +6,11 @@ import (
 
 
 func main(){
-	client, err  := SOURCE.API_Token()
+	instance, err  := SOURCE.API_Token()
 	if err != nil {
 		panic(err)
 	}
+	SOURCE.BoxBlood(instance)
 	
 
 }

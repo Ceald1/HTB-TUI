@@ -1,4 +1,4 @@
-package src
+package format
 
 import (
 	"github.com/charmbracelet/lipgloss"
