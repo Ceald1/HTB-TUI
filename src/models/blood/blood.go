@@ -28,7 +28,7 @@ type model struct {
 	err          error
 	MachineBlood Blood
 	HTBClient    HTB.Client
-	Machine		 seasons.ActiveMachineResponse
+	Machine      seasons.ActiveMachineResponse
 }
 
 type Blood struct {
@@ -38,47 +38,77 @@ type Blood struct {
 
 func InitialModel(HTBClient *HTB.Client) model {
 	s := spinner.New()
-	s.Spinner = spinner.Pulse
+	custom_spinner := spinner.Spinner{
+		Frames: []string{
+`▖`,`▘`,`▝`,`▗`,``,
+},
+FPS: time.Second / 10,
+	}
+	s.Spinner = custom_spinner
 	return model{spinner: s, HTBClient: *HTBClient}
 }
 
 func (m model) Init() tea.Cmd {
-	machine := SeasonalMachine(m.HTBClient)
+	machine, err := SeasonalMachine(&m.HTBClient)
+	if err != nil {
+		m.err = err
+		return m.spinner.Tick
+	}
 	m.Machine = machine
 	return tea.Batch(
 		m.spinner.Tick,
-		bloodTaskCmd(m.HTBClient, m.Machine), // Start the periodic check
+		bloodTaskCmd(&m.HTBClient, m.Machine), // Start the periodic check
 	)
 }
 
-func bloodTaskCmd(client HTB.Client, machine seasons.ActiveMachineResponse) tea.Cmd {
+// Returns (machine, error)
+func SeasonalMachine(client *HTB.Client) (seasons.ActiveMachineResponse, error) {
+	ctx := context.Background()
+	machine, err := client.Seasons.ActiveMachine(ctx)
+	if err != nil {
+		return machine, fmt.Errorf("error getting current machine! %w", err)
+	}
+	// Defensive: check machine.Data.Id (assuming Id is int, zero means invalid)
+	if machine.Data.Id == 0 {
+		return machine, fmt.Errorf("active machine Data.Id is zero")
+	}
+	return machine, nil
+}
+
+func bloodTaskCmd(client *HTB.Client, machine seasons.ActiveMachineResponse) tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
-		
+
 		machineID := machine.Data.Id
+
 		activeMachineInfo := client.Machines.Machine(machineID)
+
+		defer func() {
+			if r := recover(); r != nil {
+				// fmt.Printf("Recovered from panic in activeMachineInfo.Info: %v\n", r)
+				
+			}
+		}()
+
 		machineInfo, err := activeMachineInfo.Info(ctx)
 		if err != nil {
-			fmt.Println("error getting Blood INFO")
-			panic(err)
+			return bloodMsg{Err: fmt.Errorf("error getting Blood INFO: %w", err)}
 		}
-		root := machineInfo.Data.RootBlood.User.Name
-		user := machineInfo.Data.UserBlood.User.Name
+
+		var user, root string
+
+		// Defensive: UserBlood and RootBlood are structs, not pointers
+		// So check their fields, not nil
+		if machineInfo.Data.UserBlood.User.Name != "" {
+			user = machineInfo.Data.UserBlood.User.Name
+		}
+		if machineInfo.Data.RootBlood.User.Name != "" {
+			root = machineInfo.Data.RootBlood.User.Name
+		}
+
 		return bloodMsg{User: user, Root: root}
 	}
 }
-
-func SeasonalMachine(client HTB.Client) (seasons.ActiveMachineResponse) {
-	ctx := context.Background()
-	machine, err := client.Seasons.ActiveMachine(ctx)
-		if err != nil {
-			fmt.Println("error getting current machine!")
-			fmt.Println(machine.Data)
-			panic(err)
-		}
-	return machine
-}
-
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -112,7 +142,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.spinner.Tick,
 			func() tea.Msg {
 				time.Sleep(30 * time.Second)
-				return bloodTaskCmd(m.HTBClient, m.Machine)()
+				return bloodTaskCmd(&m.HTBClient, m.Machine)()
 			},
 		)
 
@@ -129,11 +159,8 @@ func (m model) View() string {
 	}
 	var str string
 	redStyle := lipgloss.NewStyle().Foreground(format.Red)
-	if len(m.MachineBlood.User) < 1 && len(m.MachineBlood.Root) < 1 {
-		str = redStyle.Render(fmt.Sprintf("\n\n   %s Awaiting Bloods...press q to quit\n\n", m.spinner.View()))
-	} else {
-		str = redStyle.Render(fmt.Sprintf("\n\n   %s Awaiting Bloods...press q to quit\n\n user: %s\n root: %s", m.spinner.View(), m.MachineBlood.User, m.MachineBlood.Root))
-	}
+	str = redStyle.Render(fmt.Sprintf("\n\n   %s Awaiting Bloods...press q to quit\n\n user: %s\n\n root: %s", m.spinner.View(), m.MachineBlood.User, m.MachineBlood.Root))
+
 	if m.quit {
 		return str + "\n"
 	}

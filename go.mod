@@ -7,7 +7,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.6
 	github.com/charmbracelet/huh v0.7.0
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/gubarz/gohtb v0.0.8
+	github.com/gubarz/gohtb v0.0.11
 )
 
 require (
