@@ -189,7 +189,7 @@ func (m *model) recalculateTable() {
 	m.Boxes = m.Boxes.
 		WithTargetWidth(m.calculateWidth()).
 		WithMinimumHeight(m.calculateHeight()).
-		WithPageSize(m.calculateHeight() - 10)
+		WithPageSize(m.calculateHeight() - 7)
 }
 
 func (m model) calculateWidth() int {
@@ -212,11 +212,28 @@ func (m model) View() string {
 }
 
 func Run(HTBClient *HTB.Client) string {
-	fmt.Println("fetching boxes....")
-	boxes := getBoxes(HTBClient)
+	fmt.Printf("fetching boxes....\n")
+	// boxes := getBoxes(HTBClient)
+	task := format.Task(func(a any) any {
+		if client, ok := a.(*HTB.Client); ok {
+			boxes := getBoxes(client)
+			return boxes
+		}
+		return nil
+	})
+	err := format.RunLoading(task, HTBClient)
+	if err != nil {
+		panic(err)
+	}
+	boxes, _ := format.TaskResult.(machineListData)
+	fmt.Print("\033[H\033[2J")
+	
+
+	
+	
 	p := tea.NewProgram(NewModel(boxes), tea.WithAltScreen())
 
-	fmt.Println("done fetching boxes!")
+	// fmt.Println("done fetching boxes!")
 
 	p.Run()
 	return SelectedBox

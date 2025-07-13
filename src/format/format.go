@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 var (
@@ -20,6 +22,7 @@ var (
 	LightBlue  = lipgloss.Color("#C5D1EB")
 	Blue       = lipgloss.Color("#5CB2FF")
 	LightGreen = lipgloss.Color("#C5F467")
+	DarkPurple = lipgloss.Color("#A000FF")
 
 	// Optional: Text color for dark backgrounds (use primary palette for accents)
 	TextDefault = Purple
@@ -31,6 +34,7 @@ var (
 	TextBlue    = Blue
 	TextLightGreen = LightGreen
 	TextTitle = LightGreen
+	TextPurple = DarkPurple
 
 )
 
@@ -60,10 +64,80 @@ func CheckDiff(difficulty string) (color string) {
 		case "hard":
 			color = lipgloss.NewStyle().Foreground(TextRed).Render(difficulty)
 		case "insane":
-			color = lipgloss.NewStyle().Foreground(TextDefault).Render(difficulty)
+			color = lipgloss.NewStyle().Foreground(TextPurple).Render(difficulty)
+		default:
+			color = lipgloss.NewStyle().Foreground(TextLightBlue).Render(difficulty)
 		
 		
-		
+	}
+	return
+}
+
+
+
+type Task func(any) any
+
+type loading struct {
+	model spinner.Model
+	task  tea.Cmd
+}
+
+type doneMSG struct {
+	result any
+}
+
+var TaskResult any
+
+func HelpTask(task Task, args any) tea.Cmd {
+	return func() tea.Msg {
+		result := task(args)
+		return doneMSG{result: result}
+	}
+}
+
+func InitialLoadingModel(task Task, args any) loading {
+	s := spinner.New()
+	s.Spinner = spinner.Meter
+	return loading{
+		model: s,
+		task:  HelpTask(task, args),
+	}
+}
+
+func (m loading) Init() tea.Cmd {
+	return tea.Batch(
+		m.model.Tick,
+		m.task,
+	)
+}
+
+func (m loading) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q", "esc", "ctrl+c":
+			return m, tea.Quit
+		}
+	case doneMSG:
+		TaskResult = msg.result
+		return m, tea.Quit
+	default:
+		var cmd tea.Cmd
+		m.model, cmd = m.model.Update(msg)
+		return m, cmd
+	}
+	return  m, nil
+}
+
+func (m loading) View() string {
+	str := lipgloss.NewStyle().Foreground(TextTitle).Render(m.model.View())
+	return str
+}
+
+func RunLoading(task Task, args any) (err error) {
+	p := tea.NewProgram(InitialLoadingModel(task, args))
+	if _, err = p.Run(); err != nil {
+		return err
 	}
 	return
 }
