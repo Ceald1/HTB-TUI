@@ -34,9 +34,9 @@ func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) 
 	var boxAction string
 	var flag string
 	boxInfoData := boxInfo.Data
-	boxStatus := boxInfoData.InfoStatus
+	boxStatus := lipgloss.NewStyle().Foreground(format.Pink).Render(boxInfoData.InfoStatus)
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "OS: %s\nDifficulty: %s\nStatus: %s",
+    "OS: %s\nDifficulty: %s\nBreach Info: %s",
     format.CheckOS(boxInfoData.Os),
     format.CheckDiff(boxInfoData.DifficultyText),
     boxStatus,
@@ -45,7 +45,7 @@ func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) 
 	var flagInputPlaceholder = lipgloss.NewStyle().Foreground(format.TextBlue).Faint(true).Blink(true).Render("enter flag.. > ")
 	huh.NewForm(
 		huh.NewGroup(
-			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render(boxInfoData.Name)).
+			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Padding(1).Render(boxInfoData.Name)).
 				Description(FormInfo),
 			huh.NewInput().Prompt(flagInputPlaceholder).Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Submit Flag")).Value(&flag),
 			huh.NewSelect[string]().Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Box Action")).

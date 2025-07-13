@@ -17,7 +17,7 @@ var (
 	Purple     = lipgloss.Color("#A4B1CD")
 	Red        = lipgloss.Color("#FF8484")
 	Cyan       = lipgloss.Color("#5CECC6")
-	Pink       = lipgloss.Color("#CFBDFB")
+	Pink       = lipgloss.Color("#FFB3DE") // replaced
 	Yellow     = lipgloss.Color("#FFCC5C")
 	LightBlue  = lipgloss.Color("#C5D1EB")
 	Blue       = lipgloss.Color("#5CB2FF")
@@ -37,7 +37,27 @@ var (
 	TextPurple = DarkPurple
 
 )
+var ColorsBrightToDark = []lipgloss.Color{
+	Yellow,     // #FFCC5C
+	LightGreen, // #C5F467
+	Cyan,       // #5CECC6
+	LightBlue,  // #C5D1EB
+	Pink,       // #FFB3DE
+	Blue,       // #5CB2FF
+	Red,        // #FF8484
+	Purple,     // #A4B1CD
+	DarkPurple, // #A000FF
+}
+var ColorIndex = 0
 
+func NextColor() lipgloss.Color {
+	if ColorIndex >= len(ColorsBrightToDark) {
+		ColorIndex = 0
+	}
+	color := ColorsBrightToDark[ColorIndex]
+	ColorIndex++
+	return color
+}
 func CheckOS(BoxOS string) (color string) {
 	BoxOS = strings.ToLower(BoxOS)
 	switch BoxOS{

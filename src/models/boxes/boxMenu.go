@@ -213,7 +213,7 @@ func (m model) View() string {
 
 func Run(HTBClient *HTB.Client) string {
 	SelectedBox = ""
-	fmt.Printf("fetching boxes....\n")
+	fmt.Println(`fetching boxes.... If loaded before type "q" to skip loading`)
 	// boxes := getBoxes(HTBClient)
 	task := format.Task(func(a any) any {
 		if client, ok := a.(*HTB.Client); ok {
@@ -226,11 +226,13 @@ func Run(HTBClient *HTB.Client) string {
 	if err != nil {
 		panic(err)
 	}
-	boxes, _ := format.TaskResult.(machineListData)
+	boxes, ok := format.TaskResult.(machineListData)
+	if !ok {
+		panic("error checking task result for machines!")
+	}
 	fmt.Print("\033[H\033[2J")
 	
 
-	
 	
 	p := tea.NewProgram(NewModel(boxes), tea.WithAltScreen())
 

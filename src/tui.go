@@ -8,6 +8,7 @@ import (
 
 	BloodModel "github.com/Ceald1/HTB-TUI/src/models/blood"
 	BoxModel "github.com/Ceald1/HTB-TUI/src/models/boxes"
+	Fortress "github.com/Ceald1/HTB-TUI/src/models/fortress"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -45,6 +46,8 @@ func ClearTerminal() {
 }
 
 func MainMenu(HTBClient *HTB.Client) {
+	// TODO: Add challenge option and implement code for challenges
+	// TODO: Add prolab option and implement code for prolabs
 	title := lipgloss.NewStyle().Foreground(format.TextTitle).Padding(1,1,1,1).Background(format.BaseBG).Render(`Main Menu`)
 	var option string
 
@@ -54,8 +57,8 @@ func MainMenu(HTBClient *HTB.Client) {
 		Title(title).
 		Options(
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextRed).Background(format.BaseBG).Render("Monitor Bloods"), "blood"), // Bloods
-			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextCyan).Background(format.BaseBG).Render("View All Boxes"), "boxes"), // Bloods
-
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextCyan).Background(format.BaseBG).Render("View All Boxes"), "boxes"), // Boxes
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.DarkPurple).Background(format.BaseBG).Render("View Fortresses"), "fortress"), // Fortresses
 
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
 		).Value(&option).Run()
@@ -77,6 +80,17 @@ func MainMenu(HTBClient *HTB.Client) {
 				boxInfo, machineHandle := BoxModel.BoxInfo(box_selected, HTBClient)
 				BoxModel.BoxInfoMenu(boxInfo, machineHandle)
 			}
+		case "fortress":
+			var Fortress_selected = 1
+			for Fortress_selected != 0{
+				ClearTerminal()
+				Fortress_selected = Fortress.SelectFortresses(HTBClient)
+				if Fortress_selected == 0 {
+					break
+				}
+				Fortress.ViewFort(HTBClient, Fortress_selected)
+			}
+
 		case "quit":
 			os.Exit(0)
 			return
