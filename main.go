@@ -10,7 +10,8 @@ func main(){
 	if err != nil {
 		panic(err)
 	}
-	SOURCE.BoxBlood(instance)
+	SOURCE.MainMenu(instance)
+	
 	
 
 }

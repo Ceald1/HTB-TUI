@@ -40,7 +40,7 @@ func InitialModel(HTBClient *HTB.Client) model {
 	s := spinner.New()
 	custom_spinner := spinner.Spinner{
 		Frames: []string{
-`▖`,`▘`,`▝`,`▗`,``,
+`▁`, `▂`, `▃`, `▄`, `▅`, `▆`, `▇`, `█`, `▇`, `▆`, `▅`, `▄`, `▃`, `▁`,
 },
 FPS: time.Second / 10,
 	}

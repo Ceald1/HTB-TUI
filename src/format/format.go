@@ -1,6 +1,8 @@
 package format
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -32,3 +34,36 @@ var (
 
 )
 
+func CheckOS(BoxOS string) (color string) {
+	BoxOS = strings.ToLower(BoxOS)
+	switch BoxOS{
+		case "linux":
+			color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(BoxOS)
+		case "windows":
+			color = lipgloss.NewStyle().Foreground(TextBlue).Render(BoxOS)
+		case "freebsd":
+			color = lipgloss.NewStyle().Foreground(TextRed).Render(BoxOS)
+		case "openbsd":
+			color = lipgloss.NewStyle().Foreground(TextYellow).Render(BoxOS)
+		case "other":
+			color = lipgloss.NewStyle().Foreground(TextDefault).Render(BoxOS)
+	}
+	return
+}
+func CheckDiff(difficulty string) (color string) {
+	difficulty = strings.ToLower(difficulty)
+	switch difficulty{
+		case "easy":
+			color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(difficulty)
+		case "medium":
+			color = lipgloss.NewStyle().Foreground(TextYellow).Render(difficulty)
+		case "hard":
+			color = lipgloss.NewStyle().Foreground(TextRed).Render(difficulty)
+		case "insane":
+			color = lipgloss.NewStyle().Foreground(TextDefault).Render(difficulty)
+		
+		
+		
+	}
+	return
+}
