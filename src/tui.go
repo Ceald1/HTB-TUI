@@ -53,11 +53,11 @@ func MainMenu(HTBClient *HTB.Client) {
 	huh.NewSelect[string]().
 		Title(title).
 		Options(
-			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextRed).Render("Monitor Bloods"), "blood"), // Bloods
-			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextCyan).Render("View All Boxes"), "boxes"), // Bloods
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextRed).Background(format.BaseBG).Render("Monitor Bloods"), "blood"), // Bloods
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextCyan).Background(format.BaseBG).Render("View All Boxes"), "boxes"), // Bloods
 
 
-			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Render("Quit"), "quit"), // Quit
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
 		).Value(&option).Run()
 	
 	
@@ -66,8 +66,17 @@ func MainMenu(HTBClient *HTB.Client) {
 			ClearTerminal()
 			BoxBlood(HTBClient)
 		case "boxes":
-			ClearTerminal()
-			BoxModel.Run(HTBClient)
+			var box_selected = "1"
+			for box_selected != ""{
+				ClearTerminal()
+				BoxModel.Run(HTBClient)
+				box_selected = BoxModel.SelectedBox
+				if box_selected == ""{
+					break
+				}
+				boxInfo, machineHandle := BoxModel.BoxInfo(box_selected, HTBClient)
+				BoxModel.BoxInfoMenu(boxInfo, machineHandle)
+			}
 		case "quit":
 			os.Exit(0)
 			return

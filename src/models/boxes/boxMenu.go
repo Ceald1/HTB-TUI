@@ -212,6 +212,7 @@ func (m model) View() string {
 }
 
 func Run(HTBClient *HTB.Client) string {
+	SelectedBox = ""
 	fmt.Printf("fetching boxes....\n")
 	// boxes := getBoxes(HTBClient)
 	task := format.Task(func(a any) any {
