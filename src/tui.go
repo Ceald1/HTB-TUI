@@ -9,6 +9,7 @@ import (
 	BloodModel "github.com/Ceald1/HTB-TUI/src/models/blood"
 	BoxModel "github.com/Ceald1/HTB-TUI/src/models/boxes"
 	Fortress "github.com/Ceald1/HTB-TUI/src/models/fortress"
+	ChallengeModel "github.com/Ceald1/HTB-TUI/src/models/challenges"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -47,7 +48,7 @@ func ClearTerminal() {
 
 func MainMenu(HTBClient *HTB.Client) {
 	// TODO: Add challenge option and implement code for challenges
-	// TODO: Add prolab option and implement code for prolabs
+	// TODO: Add prolab option and implement code for prolabs when or if it gets support
 	title := lipgloss.NewStyle().Foreground(format.TextTitle).Padding(1,1,1,1).Background(format.BaseBG).Render(`Main Menu`)
 	var option string
 
@@ -58,6 +59,7 @@ func MainMenu(HTBClient *HTB.Client) {
 		Options(
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextRed).Background(format.BaseBG).Render("Monitor Bloods"), "blood"), // Bloods
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextCyan).Background(format.BaseBG).Render("View All Boxes"), "boxes"), // Boxes
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextYellow).Background(format.BaseBG).Render("View All Challenges"), "challenge"), // Challenges
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.DarkPurple).Background(format.BaseBG).Render("View Fortresses"), "fortress"), // Fortresses
 
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
@@ -90,7 +92,18 @@ func MainMenu(HTBClient *HTB.Client) {
 				}
 				Fortress.ViewFort(HTBClient, Fortress_selected)
 			}
-
+		case "challenge":
+			var challenge_selected = "1"
+			for challenge_selected != ""{
+				ClearTerminal()
+				ChallengeModel.Run(HTBClient)
+				challenge_selected = ChallengeModel.SelectedChallenge
+				if challenge_selected == ""{
+					break
+				}
+				challengeInfo, machineHandle := ChallengeModel.ChallengeInfo(challenge_selected, HTBClient)
+				ChallengeModel.ChallengeInfoMenu(challengeInfo, machineHandle)
+			}
 		case "quit":
 			os.Exit(0)
 			return

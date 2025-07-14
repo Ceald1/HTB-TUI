@@ -92,6 +92,15 @@ func CheckDiff(difficulty string) (color string) {
 	}
 	return
 }
+// func CheckCategory(categoryName string) (color string){
+// 	categoryName = strings.ToLower(categoryName)
+// 	switch categoryName{
+// 		case 
+// 	}
+
+// 	return
+// }
+
 
 
 
