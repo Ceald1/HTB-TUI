@@ -3,9 +3,10 @@ package format
 import (
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/term"
 )
 
 var (
@@ -169,4 +170,10 @@ func RunLoading(task Task, args any) (err error) {
 		return err
 	}
 	return
+}
+
+func SplitResp() (resp string) {
+	width, _, _ := term.GetSize(0)
+	resp = strings.Repeat("-", width - 1)
+	return resp
 }

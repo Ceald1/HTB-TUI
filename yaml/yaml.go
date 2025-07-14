@@ -8,8 +8,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
 
-	// "github.com/charmbracelet/lipgloss"
-	// "github.com/Ceald1/HTB-TUI/src/format"
 	"context"
 	"fmt"
 	"os"
@@ -107,9 +105,7 @@ type Info struct {
 }
 
 
-
-func RunAutomation(yaml_file string){
-	// parse yaml
+func RunAutomation(yaml_file string) {
 	var HTBClient *HTB.Client
 	f_data, err := os.ReadFile(yaml_file)
 	if err != nil {
@@ -127,129 +123,154 @@ func RunAutomation(yaml_file string){
 		panic(err)
 	}
 	actions := cfg.Actions
+
 	for _, action := range actions {
+		switch action.Type {
+		case "flagSubmit":
+			fs := action.Data.(FlagSubmit)
+			flag := fs.Flag
+			content_type := ""
+			boxID := fs.BoxID
+			boxName := fs.BoxName
+			ChallengeID := fs.ChallengeID
+			ChallengeName := fs.Challenge
+			fortressID := fs.FortressID
+			fortressName := fs.Fortress
 
-		switch action.Type{
-			case "flagSubmit":
-				fs := action.Data.(FlagSubmit)
-				flag := fs.Flag
-				content_type := ""
-				boxID := fs.BoxID
-				boxName := fs.BoxName
-				ChallengeID := fs.ChallengeID
-				ChallengeName := fs.Challenge
-				fortressID := fs.FortressID
-				fortressName := fs.Fortress
-				if ( boxID == 0 && ChallengeID == 0 && fortressID == 0){ // grab based on name
-					if boxName != ""{
-						boxID, err = GetMachineID(boxName, *HTBClient)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}
-						content_type = "box"
+			// resolve ID by name
+			if boxID == 0 && ChallengeID == 0 && fortressID == 0 {
+				if boxName != "" {
+					boxID, err = GetMachineID(boxName, *HTBClient)
+					if err != nil {
+						fmt.Println(ErrorText(err))
+						break
 					}
-					if ChallengeName != "" && content_type == ""{
-						ChallengeID, err = GetChallengeID(ChallengeName, *HTBClient)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}
-						content_type = "challenge"
+					content_type = "box"
+				}
+				if ChallengeName != "" && content_type == "" {
+					ChallengeID, err = GetChallengeID(ChallengeName, *HTBClient)
+					if err != nil {
+						fmt.Println(ErrorText(err))
+						break
 					}
-					if fortressName != "" && content_type == ""{
-						fortressID, err = GetFortressID(fortressName, *HTBClient)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}
-						content_type = "fortress"
+					content_type = "challenge"
+				}
+				if fortressName != "" && content_type == "" {
+					fortressID, err = GetFortressID(fortressName, *HTBClient)
+					if err != nil {
+						fmt.Println(ErrorText(err))
+						break
 					}
-				} // end of grab based on name
-				switch content_type{ // submit flag
-					case "box":
-						Handle := HTBClient.Machines.Machine(boxID)
-						resp, err := Handle.Own(ctx, flag)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}else{
-							fmt.Println(SubmissionText(resp.Data.Message))
-						}
-					case "challenge":
-						Handle := HTBClient.Challenges.Challenge(ChallengeID)
-						resp, err := Handle.Own(ctx, flag)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}else{
-							fmt.Println(SubmissionText(resp.Data.Message))
-						}
-					case "fortress":
-						Handle := HTBClient.Fortresses.Fortress(fortressID)
-						resp, err := Handle.SubmitFlag(ctx, flag)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}else{
-							fmt.Println(SubmissionText(resp.Data.Message))
-						}
-				} // end of flag submission
-			case "info":
-				fs := action.Data.(Info)
-				content_type := ""
-				boxID := fs.BoxID
-				boxName := fs.BoxName
-				ChallengeID := fs.ChallengeID
-				ChallengeName := fs.Challenge
-				fortressID := fs.FortressID
-				fortressName := fs.Fortress
-				if ( boxID == 0 && ChallengeID == 0 && fortressID == 0){ // grab based on name
-					if boxName != ""{
-						boxID, err = GetMachineID(boxName, *HTBClient)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}
-						content_type = "box"
-					}
-					if ChallengeName != "" && content_type == ""{
-						ChallengeID, err = GetChallengeID(ChallengeName, *HTBClient)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}
-						content_type = "challenge"
-					}
-					if fortressName != "" && content_type == ""{
-						fortressID, err = GetFortressID(fortressName, *HTBClient)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}
-						content_type = "fortress"
-					}
-				} // end of grab based on name
-				switch content_type{ // Lab info
-					case "box":
-						Handle := HTBClient.Machines.Machine(boxID)
-						resp, err := Handle.Info(ctx)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}else{
-							fmt.Println(resp)
-						}
-					case "challenge":
-						Handle := HTBClient.Challenges.Challenge(ChallengeID)
-						resp, err := Handle.Info(ctx)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}else{
-							fmt.Println(resp)
-						}
-					case "fortress":
-						Handle := HTBClient.Fortresses.Fortress(fortressID)
-						resp, err := Handle.Info(ctx)
-						if err != nil {
-							fmt.Println(ErrorText(err))
-						}else{
-							fmt.Println(resp)
-						}
-				} // end of lab Info
+					content_type = "fortress"
+				}
+			}
 
+			switch content_type {
+			case "box":
+				Handle := HTBClient.Machines.Machine(boxID)
+				resp, err := Handle.Own(ctx, flag)
+				if err != nil {
+					fmt.Println(ErrorText(err))
+				} else {
+					fmt.Println(SubmissionText(resp.Data.Message))
+				}
+
+			case "challenge":
+				Handle := HTBClient.Challenges.Challenge(ChallengeID)
+				resp, err := Handle.Own(ctx, flag)
+				if err != nil {
+					fmt.Println(ErrorText(err))
+				} else {
+					fmt.Println(SubmissionText(resp.Data.Message))
+				}
+
+			case "fortress":
+				Handle := HTBClient.Fortresses.Fortress(fortressID)
+				resp, err := Handle.SubmitFlag(ctx, flag)
+				if err != nil {
+					fmt.Println(ErrorText(err))
+				} else {
+					fmt.Println(SubmissionText(resp.Data.Message))
+				}
+			}
+
+			fmt.Println(format.SplitResp()) // Print once at the end
+
+		case "info":
+			fs := action.Data.(Info)
+			content_type := ""
+			boxID := fs.BoxID
+			boxName := fs.BoxName
+			ChallengeID := fs.ChallengeID
+			ChallengeName := fs.Challenge
+			fortressID := fs.FortressID
+			fortressName := fs.Fortress
+
+			// resolve ID by name
+			if boxID == 0 && ChallengeID == 0 && fortressID == 0 {
+				if boxName != "" {
+					boxID, err = GetMachineID(boxName, *HTBClient)
+					if err != nil {
+						fmt.Println(ErrorText(err))
+						break
+					}
+					content_type = "box"
+				}
+				if ChallengeName != "" && content_type == "" {
+					ChallengeID, err = GetChallengeID(ChallengeName, *HTBClient)
+					if err != nil {
+						fmt.Println(ErrorText(err))
+						break
+					}
+					content_type = "challenge"
+				}
+				if fortressName != "" && content_type == "" {
+					fortressID, err = GetFortressID(fortressName, *HTBClient)
+					if err != nil {
+						fmt.Println(ErrorText(err))
+						break
+					}
+					content_type = "fortress"
+				}
+			}
+
+			switch content_type {
+			case "box":
+				Handle := HTBClient.Machines.Machine(boxID)
+				resp, err := Handle.Info(ctx)
+				if err != nil {
+					fmt.Println(ErrorText(err))
+				} else {
+					fmt.Println(resp)
+				}
+
+			case "challenge":
+				Handle := HTBClient.Challenges.Challenge(ChallengeID)
+				resp, err := Handle.Info(ctx)
+				if err != nil {
+					fmt.Println(ErrorText(err))
+				} else {
+					data := lipgloss.NewStyle().Render(
+						lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextTitle).Padding(1, 1).Render(resp.Data.Name),
+						fmt.Sprintf("\nDifficulty: %s", lipgloss.NewStyle().Render(format.CheckDiff(resp.Data.Difficulty))),
+						fmt.Sprintf("\nCategory: %s", lipgloss.NewStyle().Foreground(format.TextDefault).Render(resp.Data.CategoryName)),
+						fmt.Sprintf("\nDescription: %s\n", lipgloss.NewStyle().Foreground(format.Pink).Render(strings.Replace(resp.Data.Description, "\n", "", -1))),
+					)
+					fmt.Println(data)
+				}
+
+			case "fortress":
+				Handle := HTBClient.Fortresses.Fortress(fortressID)
+				resp, err := Handle.Info(ctx)
+				if err != nil {
+					fmt.Println(ErrorText(err))
+				} else {
+					fmt.Println(resp)
+				}
+			}
+
+			fmt.Println(format.SplitResp()) // Print once at the end
 		}
-
 	}
 }
 
