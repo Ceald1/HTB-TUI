@@ -266,6 +266,7 @@ func SubmissionText(message string) (out string){
 
 func GetMachineID(name string, HTBClient HTB.Client) (id int, err error) {
 	name = strings.ToLower(name)
+	format.TaskResult = 0
 	task := format.Task(func(a any) any {
 		HTBClient, _ := a.(*HTB.Client)
 		contents, _ := HTBClient.Machines.ListActive().AllResults(ctx)
@@ -315,6 +316,7 @@ func GetMachineID(name string, HTBClient HTB.Client) (id int, err error) {
 
 func GetChallengeID(name string, HTBClient HTB.Client) (id int, err error) {
 	name = strings.ToLower(name)
+	format.TaskResult = 0
 	task := format.Task(func(a any) any {
 		HTBClient, _ := a.(*HTB.Client)
 		contents, _ := HTBClient.Challenges.List().AllResults(ctx)
@@ -338,6 +340,7 @@ func GetChallengeID(name string, HTBClient HTB.Client) (id int, err error) {
 
 func GetFortressID(name string, HTBClient HTB.Client) (id int, err error) {
 	name = strings.ToLower(name)
+	format.TaskResult = 0
 	task := format.Task(func(a any) any {
 		contents, _ := HTBClient.Fortresses.List(ctx)
 

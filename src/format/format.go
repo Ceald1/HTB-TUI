@@ -164,7 +164,6 @@ func (m loading) View() string {
 }
 
 func RunLoading(task Task, args any) (err error) {
-	TaskResult = 0
 	p := tea.NewProgram(InitialLoadingModel(task, args))
 	if _, err = p.Run(); err != nil {
 		return err
