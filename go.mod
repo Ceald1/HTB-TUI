@@ -9,6 +9,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/evertras/bubble-table v0.17.2
 	github.com/gubarz/gohtb v0.0.11
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

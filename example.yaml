@@ -1,0 +1,13 @@
+
+global: #global settings like token
+  token: ${HTB_TOKEN}
+
+action:
+  - flagSubmit: # use either box name or ID, recommend using ID because it'll be faster
+      box: "some box"
+      flag: "HTB{1234_example}"
+  - info: # use either challenge name or ID
+      challenge: "Power Greed"
+  - flagSubmit: # use either name or ID
+      challengeID: 123567
+      flag: ${flag1}
