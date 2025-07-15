@@ -109,9 +109,9 @@ func genRows(Challenges challengeListData) (rows []table.Row) {
 				state = lipgloss.NewStyle().Foreground(format.TextLightGreen).Render("Active")
 			case "retired":
 				state = lipgloss.NewStyle().Foreground(format.TextYellow).Render("Retired")
-			case "unreleased":
+			default:
 				state = lipgloss.NewStyle().Foreground(format.Pink).Render("Unreleased")
-
+			
 		}
 		rows = append(rows, table.NewRow(table.RowData{
 			ColumnName:     Challenge.Name,

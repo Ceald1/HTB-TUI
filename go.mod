@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/huh v0.7.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/evertras/bubble-table v0.17.2
-	github.com/gubarz/gohtb v0.0.11
+	github.com/gubarz/gohtb v0.0.12
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
 	gopkg.in/yaml.v3 v3.0.1
 )

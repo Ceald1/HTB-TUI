@@ -34,16 +34,17 @@ func ChallengeInfoMenu(ChallengeInfo challenges.InfoResponse, challengeHandle *c
 	var action string
 	var flag string
 	ChallengeInfoData := ChallengeInfo.Data
-	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "Category: %s\nDifficulty: %s\n",
+	var FormInfo = lipgloss.NewStyle().Render(fmt.Sprintf(
+    "Category: %s\nDifficulty: %s\nDescription: %s",
     ChallengeInfoData.CategoryName,
     format.CheckDiff(ChallengeInfoData.Difficulty),
+	lipgloss.NewStyle().Foreground(format.Pink).Render(ChallengeInfoData.Description),
 ))
 
 	var flagInputPlaceholder = lipgloss.NewStyle().Foreground(format.TextBlue).Faint(true).Blink(true).Render("enter flag.. > ")
 	huh.NewForm(
 		huh.NewGroup(
-			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Padding(1).Render(ChallengeInfoData.Name)).
+			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Padding(1,1).Render(ChallengeInfoData.Name)).
 				Description(FormInfo),
 			huh.NewInput().Prompt(flagInputPlaceholder).Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Submit Flag")).Value(&flag),
 			huh.NewSelect[string]().Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Action")).

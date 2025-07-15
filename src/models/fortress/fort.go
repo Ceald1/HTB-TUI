@@ -81,7 +81,7 @@ func ViewFort(HTBClient *HTB.Client, fortressID int){
 			lipgloss.NewStyle().Foreground(format.LightBlue).Render(info.Data.Company.Name), 
 			info.Data.ProgressPercent, 
 			lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(info.Data.Description, "\n")), 
-			lipgloss.NewStyle().Foreground(format.TextCyan).Render(info.Data.Points), 
+			lipgloss.NewStyle().Foreground(format.TextCyan).Render(strconv.Itoa(info.Data.Points)), 
 			lipgloss.NewStyle().Foreground(format.DarkPurple).Render(flags),
 	))
 	huh.NewForm(
