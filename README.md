@@ -7,6 +7,11 @@ An alternative to Gubarz's HTB CLI
 
 ![](demo.gif)
 
+# Box Demo
+
+![](box.gif)
+
 # Automation Demo
 
 ![](yaml.gif)
+
