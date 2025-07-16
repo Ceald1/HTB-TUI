@@ -1,0 +1,12 @@
+global: #global settings like token
+  token: ${HTB_TOKEN}
+
+
+action:
+  - vpnDownload:
+      region: "US"
+      tier: "free"
+      type: "labs"
+      outfile: "test"
+      protocol: "UDP"
+      # Will pick the best VPN

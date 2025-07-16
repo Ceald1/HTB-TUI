@@ -3,3 +3,5 @@
 .env
 HTB-TUI
 test*
+*.ovpn
+*.json

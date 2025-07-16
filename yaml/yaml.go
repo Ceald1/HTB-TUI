@@ -2,23 +2,23 @@ package yaml
 
 // TODO: make outputs pretty
 import (
+	"context"
 	"strings"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
 
-	"context"
 	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
-
 var (
 	ctx = context.Background()
 )
+
 
 type Config struct {
 	Global  GlobalSection `yaml:"global"`
@@ -32,10 +32,9 @@ type Action struct {
 	Type string
 	Data any
 }
-// TODO: Add VPN switching, downloading support, and pro lab support 
-type VPNDownload struct{} //Future implementation
+// TODO: Add VPN downloading support, and pro lab support 
 
-type VPNSwitch struct{} // Future implementation
+
 
 
 func (a *Action) UnmarshalYAML(value *yaml.Node) error {
@@ -69,15 +68,9 @@ func (a *Action) UnmarshalYAML(value *yaml.Node) error {
 		if err := valNode.Decode(&vpn); err != nil {
 			return err
 		}
-		a.Type = "vpnDownload"
+		a.Type = "vpn"
 		a.Data = vpn
-	case "vpnSwitch":
-		var vpn VPNSwitch
-		if err := valNode.Decode(&vpn); err != nil {
-			return err
-		}
-		a.Type = "vpnSwitch"
-		a.Data = vpn
+
 	default:
 		return fmt.Errorf("unknown action type: %s", keyNode.Value)
 	}
@@ -126,6 +119,41 @@ func RunAutomation(yaml_file string) {
 
 	for _, action := range actions {
 		switch action.Type {
+		case "vpn":
+			fs := action.Data.(VPNDownload)
+			region := strings.ToUpper(fs.Region)
+			if region == ""{
+				fmt.Println(ErrorText(fmt.Errorf("Region is required!")))
+				break
+			}
+			tier := strings.ToLower(fs.Tier)
+			if tier == ""{
+				fmt.Println(ErrorText(fmt.Errorf("Tier is required (free, vip, vip+, or unknown)!")))
+				break
+			}
+			typeVpn := strings.ToLower(fs.Type)
+			if typeVpn == ""{
+				fmt.Println(ErrorText(fmt.Errorf("Type is required (labs, release_arena, endgame, prolab, or fortress)!")))
+				break
+			}
+			outFile := fs.Outfile
+			if outFile == ""{
+				fmt.Println(ErrorText(fmt.Errorf("Outfile name is required (don't put .ovpn)!")))
+				break
+			}
+			protocol := strings.ToLower(fs.Protocol)
+			if protocol != "udp" && protocol != "tcp"{
+				fmt.Println("invalid protocol found, defaulting to TCP")
+				protocol = "tcp"
+			}
+			err = DownloadVPN(HTBClient, region, tier, typeVpn, outFile, protocol)
+			if err != nil {
+				fmt.Println(ErrorText(err))
+				return
+			}
+
+
+		
 		case "flagSubmit":
 			fs := action.Data.(FlagSubmit)
 			flag := fs.Flag
@@ -285,104 +313,9 @@ func SubmissionText(message string) (out string){
 }
 
 
-func GetMachineID(name string, HTBClient HTB.Client) (id int, err error) {
-	name = strings.ToLower(name)
-	format.TaskResult = 0
-	task := format.Task(func(a any) any {
-		HTBClient, _ := a.(*HTB.Client)
-		contents, _ := HTBClient.Machines.ListActive().AllResults(ctx)
-		Response := contents.Data
-		for _, r := range Response {
-			if strings.ToLower(r.Name) == name {
-				id = r.Id
-				return id
-			}
-		}
-		contents, err = HTBClient.Machines.ListRetired().AllResults(ctx)
-
-		Response = contents.Data
-		for _, r := range Response {
-			if strings.ToLower(r.Name) == name {
-				id = r.Id
-				return id
-			}
-		}
-
-		contents1, _ := HTBClient.Machines.ListUnreleased().AllResults(ctx)
-
-		Response1 := contents1.Data
-		for _, r := range Response1 {
-			if strings.ToLower(r.Name) == name {
-				id = r.Id
-				return id
-			}
-		}
-		return 0
-	})
-	err = format.RunLoading(task, &HTBClient)
-	if err != nil {
-		return
-	}
-
-	id, _ = format.TaskResult.(int)
-	if id == 0{
-		err = fmt.Errorf("unable to find machine")
-	}
-	return
-
-}
 
 
 
 
-func GetChallengeID(name string, HTBClient HTB.Client) (id int, err error) {
-	name = strings.ToLower(name)
-	format.TaskResult = 0
-	task := format.Task(func(a any) any {
-		HTBClient, _ := a.(*HTB.Client)
-		contents, _ := HTBClient.Challenges.List().AllResults(ctx)
-		Response := contents.Data
-		for _, r := range Response {
-			if strings.ToLower(r.Name) == name {
-				id = r.Id
-				return id
-			}
-		}
-		return 0 
-	})
-	err = format.RunLoading(task, &HTBClient)
-	if format.TaskResult == 0 {
-		err = fmt.Errorf("unable to find challenge")
-	}
-	id, _ = format.TaskResult.(int)
-	return 
 
-}
 
-func GetFortressID(name string, HTBClient HTB.Client) (id int, err error) {
-	name = strings.ToLower(name)
-	format.TaskResult = 0
-	task := format.Task(func(a any) any {
-		contents, _ := HTBClient.Fortresses.List(ctx)
-
-		Response := contents.Data
-		for _, r := range Response {
-			if strings.ToLower(r.Name) == name {
-				id = r.Id
-				return id
-			}
-		}
-	return 0
-	})
-	err = format.RunLoading(task, &HTBClient)
-	if err != nil {
-		return
-	}
-	if format.TaskResult == 0 {
-		err = fmt.Errorf("unable to find challenge")
-		return
-	}
-	id, _ = format.TaskResult.(int)
-	return
-
-}
