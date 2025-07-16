@@ -49,7 +49,6 @@ func ClearTerminal() {
 
 func MainMenu(HTBClient *HTB.Client) {
 	// TODO: Add challenge option and implement code for challenges
-	// TODO: Add prolab option and implement code for prolabs when or if it gets support
 	title := lipgloss.NewStyle().Foreground(format.TextTitle).Padding(1,1,1,1).Background(format.BaseBG).Render(`Main Menu`)
 	var option string
 

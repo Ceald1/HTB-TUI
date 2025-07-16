@@ -11,6 +11,9 @@ An alternative to Gubarz's HTB CLI
 
 ![](box.gif)
 
+# Pro Lab Demo
+![](pro.gif)
+
 # Automation Demo
 
 ![](yaml.gif)

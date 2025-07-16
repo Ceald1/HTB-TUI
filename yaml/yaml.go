@@ -32,7 +32,7 @@ type Action struct {
 	Type string
 	Data any
 }
-// TODO: Add VPN switching and downloading support
+// TODO: Add VPN switching, downloading support, and pro lab support 
 type VPNDownload struct{} //Future implementation
 
 type VPNSwitch struct{} // Future implementation
