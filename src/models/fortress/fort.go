@@ -74,13 +74,13 @@ func ViewFort(HTBClient *HTB.Client, fortressID int){
 	var flag string
 	
 	flags := strconv.Itoa(len(info.Data.Flags))
-	var title = lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Padding(1).Render(info.Data.Name)
+	var title = lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Padding(1).Render(format.Sanitize(info.Data.Name))
 	
 	description := lipgloss.NewStyle().Render(fmt.Sprintf(
 		"Company: %s \nCompleted: %.0f%% \nDescription: %s \nPoints: %s \nFlags: %s \n ", 
 			lipgloss.NewStyle().Foreground(format.LightBlue).Render(info.Data.Company.Name), 
 			info.Data.ProgressPercent, 
-			lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(info.Data.Description, "\n")), 
+			lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(format.Sanitize(info.Data.Description), "\n")), 
 			lipgloss.NewStyle().Foreground(format.TextCyan).Render(strconv.Itoa(info.Data.Points)), 
 			lipgloss.NewStyle().Foreground(format.DarkPurple).Render(flags),
 	))
@@ -88,7 +88,7 @@ func ViewFort(HTBClient *HTB.Client, fortressID int){
 		huh.NewGroup(
 			huh.NewNote().Title(title).Description(description),
 			huh.NewInput().Prompt(flagInputPlaceholder).Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Submit Flag")).Value(&flag),
-			huh.NewSelect[string]().Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Box Action")).
+			huh.NewSelect[string]().Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Action")).
 				Options(
 					huh.NewOption(lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextDefault).Render("continue"), "none"),
 					huh.NewOption(lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextYellow).Render("Reset"), "reset"),

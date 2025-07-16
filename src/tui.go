@@ -10,6 +10,7 @@ import (
 	BoxModel "github.com/Ceald1/HTB-TUI/src/models/boxes"
 	Fortress "github.com/Ceald1/HTB-TUI/src/models/fortress"
 	ChallengeModel "github.com/Ceald1/HTB-TUI/src/models/challenges"
+	ProlabModel "github.com/Ceald1/HTB-TUI/src/models/prolabs"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -61,6 +62,7 @@ func MainMenu(HTBClient *HTB.Client) {
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextCyan).Background(format.BaseBG).Render("View All Boxes"), "boxes"), // Boxes
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextYellow).Background(format.BaseBG).Render("View All Challenges"), "challenge"), // Challenges
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.DarkPurple).Background(format.BaseBG).Render("View Fortresses"), "fortress"), // Fortresses
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightGreen).Background(format.BaseBG).Render("View Pro Labs"), "prolabs"), // Pro Labs
 
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
 		).Value(&option).Run()
@@ -104,6 +106,19 @@ func MainMenu(HTBClient *HTB.Client) {
 				challengeInfo, machineHandle := ChallengeModel.ChallengeInfo(challenge_selected, HTBClient)
 				ChallengeModel.ChallengeInfoMenu(challengeInfo, machineHandle)
 			}
+
+		case "prolabs":
+			var prolabSelected = 1
+			for prolabSelected != 0{
+				ClearTerminal()
+				prolabSelected = ProlabModel.SelectProlabs(HTBClient)
+				if prolabSelected == 0 {
+					break
+				}
+				ProlabModel.ViewProLab(HTBClient, prolabSelected)
+			}
+
+		
 		case "quit":
 			os.Exit(0)
 			return

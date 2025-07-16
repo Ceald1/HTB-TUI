@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 var (
@@ -50,6 +51,11 @@ var ColorsBrightToDark = []lipgloss.Color{
 	DarkPurple, // #A000FF
 }
 var ColorIndex = 0
+
+func Sanitize(inputStr string) (string) {
+	p := bluemonday.StripTagsPolicy()
+	return p.Sanitize(inputStr)
+}
 
 func NextColor() lipgloss.Color {
 	if ColorIndex >= len(ColorsBrightToDark) {
