@@ -8,7 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
-	"github.com/gubarz/gohtb/services/problabs"
+	"github.com/gubarz/gohtb/services/prolabs"
 	"github.com/Ceald1/HTB-TUI/src/format"
 )
 

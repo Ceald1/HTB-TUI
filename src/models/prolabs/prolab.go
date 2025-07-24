@@ -11,7 +11,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
-	"github.com/gubarz/gohtb/services/problabs"
+	"github.com/gubarz/gohtb/services/prolabs"
 )
 
 
