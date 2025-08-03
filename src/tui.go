@@ -48,7 +48,6 @@ func ClearTerminal() {
 }
 
 func MainMenu(HTBClient *HTB.Client) {
-	// TODO: Add challenge option and implement code for challenges
 	title := lipgloss.NewStyle().Foreground(format.TextTitle).Padding(1,1,1,1).Background(format.BaseBG).Render(`Main Menu`)
 	var option string
 

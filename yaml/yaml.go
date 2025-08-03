@@ -269,7 +269,15 @@ func RunAutomation(yaml_file string) {
 				if err != nil {
 					fmt.Println(ErrorText(err))
 				} else {
-					fmt.Println(resp)
+					data := lipgloss.NewStyle().Render(
+						lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextTitle).Padding(1,1).Render(resp.Data.Name),
+						fmt.Sprintf("\nDifficulty: %s", lipgloss.NewStyle().Render(format.CheckDiff(resp.Data.DifficultyText))),
+						fmt.Sprintf("\nOS: %s", lipgloss.NewStyle().Foreground(format.TextDefault).Render(format.CheckOS(resp.Data.Os))),
+						fmt.Sprintf("\nCredentials: %s:%s", lipgloss.NewStyle().Foreground(format.Pink).Render(resp.Data.Credentials.Username), lipgloss.NewStyle().Foreground(format.Pink).Render(resp.Data.Credentials.Password)),
+					)
+					
+					
+					fmt.Println(data)
 				}
 
 			case "challenge":
@@ -293,7 +301,13 @@ func RunAutomation(yaml_file string) {
 				if err != nil {
 					fmt.Println(ErrorText(err))
 				} else {
-					fmt.Println(resp)
+					data := lipgloss.NewStyle().Render(
+						lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextTitle).Padding(1, 1).Render(resp.Data.Name),
+						fmt.Sprintf("\n# Of Flags: %s", lipgloss.NewStyle().Render(string(len(resp.Data.Flags)))),
+						fmt.Sprintf("\nCompany: %s", lipgloss.NewStyle().Foreground(format.TextDefault).Render(resp.Data.Company.Name)),
+						fmt.Sprintf("\nDescription: %s\n", lipgloss.NewStyle().Foreground(format.Pink).Render(strings.Replace(resp.Data.Description, "\n", "", -1))),
+					)
+					fmt.Println(data)
 				}
 			}
 
