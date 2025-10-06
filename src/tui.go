@@ -5,12 +5,14 @@ package src
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	BloodModel "github.com/Ceald1/HTB-TUI/src/models/blood"
 	BoxModel "github.com/Ceald1/HTB-TUI/src/models/boxes"
-	Fortress "github.com/Ceald1/HTB-TUI/src/models/fortress"
 	ChallengeModel "github.com/Ceald1/HTB-TUI/src/models/challenges"
+	Fortress "github.com/Ceald1/HTB-TUI/src/models/fortress"
 	ProlabModel "github.com/Ceald1/HTB-TUI/src/models/prolabs"
+	SherlockModel "github.com/Ceald1/HTB-TUI/src/models/sherlocks"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -61,6 +63,7 @@ func MainMenu(HTBClient *HTB.Client) {
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextYellow).Background(format.BaseBG).Render("View All Challenges"), "challenge"), // Challenges
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.DarkPurple).Background(format.BaseBG).Render("View Fortresses"), "fortress"), // Fortresses
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightGreen).Background(format.BaseBG).Render("View Pro Labs"), "prolabs"), // Pro Labs
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.Blue).Background(format.BaseBG).Render("View Sherlocks"), "sherlocks"), // Sherlocks
 
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
 		).Value(&option).Run()
@@ -114,6 +117,20 @@ func MainMenu(HTBClient *HTB.Client) {
 					break
 				}
 				ProlabModel.ViewProLab(HTBClient, prolabSelected)
+			}
+		
+		case "sherlocks":
+			var sherlock_selected = "1"
+			var sherlock_selected_i int
+			for sherlock_selected != ""{
+				ClearTerminal()
+				SherlockModel.Run(HTBClient)
+				sherlock_selected = SherlockModel.Selected
+				if sherlock_selected == ""{
+					break
+				}
+				sherlock_selected_i, _ = strconv.Atoi(sherlock_selected)
+				SherlockModel.ViewSherlock(HTBClient, sherlock_selected_i)
 			}
 
 		
