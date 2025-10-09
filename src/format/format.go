@@ -5,9 +5,10 @@ import (
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
-	"golang.org/x/term"
 	"github.com/microcosm-cc/bluemonday"
+	"golang.org/x/term"
 )
 
 var (
@@ -51,6 +52,57 @@ var ColorsBrightToDark = []lipgloss.Color{
 	DarkPurple, // #A000FF
 }
 var ColorIndex = 0
+
+func HTBTheme()*huh.Theme{
+	t := huh.ThemeBase()
+
+	var (
+		background = lipgloss.AdaptiveColor{Dark: "#141D2B"}
+		selection  = lipgloss.AdaptiveColor{Dark: "#C5D1EB"}
+		foreground = lipgloss.AdaptiveColor{Dark: "#A4B1CD"}
+		comment    = lipgloss.AdaptiveColor{Dark: "#5CB2FF"}
+		green      = lipgloss.AdaptiveColor{Dark: "#C5F467"}
+		purple     = lipgloss.AdaptiveColor{Dark: "#A000FF"}
+		red        = lipgloss.AdaptiveColor{Dark: "#FF8484"}
+		yellow     = lipgloss.AdaptiveColor{Dark: "#FFCC5C"}
+	)
+
+	t.Focused.Base = t.Focused.Base.BorderForeground(selection)
+	t.Focused.Card = t.Focused.Base
+	t.Focused.Title = t.Focused.Title.Foreground(purple)
+	t.Focused.NoteTitle = t.Focused.NoteTitle.Foreground(purple)
+	t.Focused.Description = t.Focused.Description.Foreground(comment)
+	t.Focused.ErrorIndicator = t.Focused.ErrorIndicator.Foreground(red)
+	t.Focused.Directory = t.Focused.Directory.Foreground(purple)
+	t.Focused.File = t.Focused.File.Foreground(foreground)
+	t.Focused.ErrorMessage = t.Focused.ErrorMessage.Foreground(red)
+	t.Focused.SelectSelector = t.Focused.SelectSelector.Foreground(yellow)
+	t.Focused.NextIndicator = t.Focused.NextIndicator.Foreground(yellow)
+	t.Focused.PrevIndicator = t.Focused.PrevIndicator.Foreground(yellow)
+	t.Focused.Option = t.Focused.Option.Foreground(foreground)
+	t.Focused.MultiSelectSelector = t.Focused.MultiSelectSelector.Foreground(yellow)
+	t.Focused.SelectedOption = t.Focused.SelectedOption.Foreground(green)
+	t.Focused.SelectedPrefix = t.Focused.SelectedPrefix.Foreground(green)
+	t.Focused.UnselectedOption = t.Focused.UnselectedOption.Foreground(foreground)
+	t.Focused.UnselectedPrefix = t.Focused.UnselectedPrefix.Foreground(comment)
+	t.Focused.FocusedButton = t.Focused.FocusedButton.Foreground(green).Background(purple).Bold(true)
+	t.Focused.BlurredButton = t.Focused.BlurredButton.Foreground(foreground).Background(background)
+
+	t.Focused.TextInput.Cursor = t.Focused.TextInput.Cursor.Foreground(yellow)
+	t.Focused.TextInput.Placeholder = t.Focused.TextInput.Placeholder.Foreground(comment)
+	t.Focused.TextInput.Prompt = t.Focused.TextInput.Prompt.Foreground(yellow)
+
+	t.Blurred = t.Focused
+	t.Blurred.Base = t.Blurred.Base.BorderStyle(lipgloss.HiddenBorder())
+	t.Blurred.Card = t.Blurred.Base
+	t.Blurred.NextIndicator = lipgloss.NewStyle()
+	t.Blurred.PrevIndicator = lipgloss.NewStyle()
+
+	t.Group.Title = t.Focused.Title
+	t.Group.Description = t.Focused.Description
+
+	return t
+}
 
 func Sanitize(inputStr string) (string) {
 	p := bluemonday.StripTagsPolicy()

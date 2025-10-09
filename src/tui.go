@@ -13,6 +13,7 @@ import (
 	Fortress "github.com/Ceald1/HTB-TUI/src/models/fortress"
 	ProlabModel "github.com/Ceald1/HTB-TUI/src/models/prolabs"
 	SherlockModel "github.com/Ceald1/HTB-TUI/src/models/sherlocks"
+	Vpn "github.com/Ceald1/HTB-TUI/src/models/vpn"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -64,6 +65,7 @@ func MainMenu(HTBClient *HTB.Client) {
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.DarkPurple).Background(format.BaseBG).Render("View Fortresses"), "fortress"), // Fortresses
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightGreen).Background(format.BaseBG).Render("View Pro Labs"), "prolabs"), // Pro Labs
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.Blue).Background(format.BaseBG).Render("View Sherlocks"), "sherlocks"), // Sherlocks
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightBlue).Background(format.BaseBG).Render("Download VPN"), "vpn"), // VPN
 
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
 		).Value(&option).Run()
@@ -132,6 +134,19 @@ func MainMenu(HTBClient *HTB.Client) {
 				sherlock_selected_i, _ = strconv.Atoi(sherlock_selected)
 				SherlockModel.ViewSherlock(HTBClient, sherlock_selected_i)
 			}
+		case "vpn":
+			vpn_data := Vpn.SelectVPNLabs(HTBClient)
+			var fileName  string
+			if len(vpn_data) > 1 {
+				huh.NewInput().Value(&fileName).
+					Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("File Name")).
+					Prompt("file name to store vpn with .ovpn: ").Run()
+				err := os.WriteFile(fileName, vpn_data, 0644)
+				if err != nil {
+					panic(err)
+				}
+			}
+
 
 		
 		case "quit":
