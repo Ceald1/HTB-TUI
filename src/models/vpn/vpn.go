@@ -27,7 +27,7 @@ func SelectVPNLabs(HTBClient *HTB.Client) (vpn_data []byte) {
 	var quit_value = "9999999999999"
 	quit_op := huh.NewOption(lipgloss.NewStyle().Foreground(format.Red).Background(format.BaseBG).Render("Quit"), quit_value)
 	options = append(options, quit_op)
-	var vpn_options = []string{"labs","prolabs", "starting_point", "fortresses"}
+	var vpn_options = []string{"labs","prolabs", "starting_point", "fortresses", "seasonal/competitive"}
 	for _, option := range vpn_options {
 		info := lipgloss.NewStyle().Foreground(format.NextColor()).Background(format.BaseBG).Render(option)
 		op := huh.NewOption(info, option)
@@ -39,7 +39,7 @@ func SelectVPNLabs(HTBClient *HTB.Client) (vpn_data []byte) {
 	switch selected {
 		case quit_value:
 			return
-		case "labs", "starting_point", "fortresses":
+		case "labs", "starting_point", "fortresses", "seasonal/competitive":
 			return DownloadLabVPN(HTBClient, selected)
 		case "prolabs":
 			return DownloadProlabVPN(HTBClient)
@@ -50,6 +50,9 @@ func SelectVPNLabs(HTBClient *HTB.Client) (vpn_data []byte) {
 }
 
 func DownloadLabVPN(HTBClient *HTB.Client, product string) (vpn_data []byte) {
+	if product == "seasonal/competitive"{
+		product = "competitive"
+	}
 	servers, err := HTBClient.VPN.Servers(product).Results(ctx)
 	var selected int
 	var proto bool
