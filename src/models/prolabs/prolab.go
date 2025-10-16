@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
+	// "strings"
 	"time"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
@@ -12,6 +12,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
 	"github.com/gubarz/gohtb/services/prolabs"
+	"github.com/kopoli/go-terminal-size"
 )
 
 
@@ -66,6 +67,34 @@ func SelectProlabs(HTBClient *HTB.Client) (selectedLab int) {
 
 	}
 }
+func calculateTwentyPercentHeight() int {
+    size, err := tsize.GetSize()
+    if err != nil {
+        return 5  // Fallback to a small fixed height
+    }
+    return int(float64(size.Height) * 0.2)
+}
+
+func calculateTwentyPercentWidth() int {
+    size, err := tsize.GetSize()
+    if err != nil {
+        return 5  // Fallback to a small fixed height
+    }
+    return int(float64(size.Width))
+}
+
+// // Create a style using 20% height
+// twentyPercentStyle := lipgloss.NewStyle().
+//     Height(calculateTwentyPercentHeight()).
+//     Width(calculateResponsiveWidth(terminalWidth)).
+//     Padding(1).
+//     Border(lipgloss.RoundedBorder()).
+//     BorderForeground(lipgloss.Color("240"))
+
+// // Usage example
+// func renderTextBlock(content string) string {
+//     return twentyPercentStyle.Render(content)
+// }
 
 
 func ViewProLab(HTBClient *HTB.Client, selectedProlab int) {
@@ -81,10 +110,22 @@ func ViewProLab(HTBClient *HTB.Client, selectedProlab int) {
 	progressResp, _ := labData.Progress(ctx)
 	progress := progressResp.Data.Ownership
 
-	description := lipgloss.NewStyle().Render(fmt.Sprintf(
-		"Completed: %.0f%% \nDescription: %s \nFlags: %s \n ", 
+
+	// description := lipgloss.NewStyle().
+	//     Height(calculateTwentyPercentHeight()).
+    // 	Width(calculateTwentyPercentWidth()).
+	// Render(fmt.Sprintf(
+	// 	"Completed: %.0f%% \nDescription: %s \nFlags: %s \n ", 
+	// 		progress, 
+	// 		lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(strings.TrimSpace(format.Sanitize(info.Data.Description)), "\n")), 
+	// 		lipgloss.NewStyle().Foreground(format.DarkPurple).Render(flags),
+	// ))
+
+	description := lipgloss.NewStyle().
+		Render(fmt.Sprintf(
+		"Completed: %.0f%%\nFlags: %s \n ", 
 			progress, 
-			lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(strings.TrimSpace(format.Sanitize(info.Data.Description)), "\n")), 
+			// lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(strings.TrimSpace(format.Sanitize(info.Data.Description)), "\n")), 
 			lipgloss.NewStyle().Foreground(format.DarkPurple).Render(flags),
 	))
 	huh.NewForm(
