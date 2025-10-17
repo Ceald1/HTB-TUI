@@ -214,7 +214,7 @@ func DownloadProlabVPN(HTBClient *HTB.Client) (vpn_data []byte) {
 
 func prolabList(HTBClient *HTB.Client) (selectedLab int) {
 		// get prolabs and do fancy ass loading
-	var labresp prolabs.ProlabDataItems
+	// var labresp prolabs.ProlabDataItems
 	task := format.Task(func(a any) any {
 		if client, ok := a.(*HTB.Client);ok {
 			labs, err := client.Prolabs.List(ctx)
@@ -233,7 +233,7 @@ func prolabList(HTBClient *HTB.Client) (selectedLab int) {
 	if !ok {
 		panic("Error checking typing for prolabs request")
 	}
-	labresp = labs.Data.Labs
+	labresp := labs.Data.Labs
 
 	var options []huh.Option[int]
 	quit_op := huh.NewOption(lipgloss.NewStyle().Foreground(format.Red).Background(format.BaseBG).Render("Quit"), quit_value)

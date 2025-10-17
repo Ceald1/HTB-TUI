@@ -23,7 +23,7 @@ var (
 
 func SelectProlabs(HTBClient *HTB.Client) (selectedLab int) {
 	// get prolabs and do fancy ass loading
-	var labresp prolabs.ProlabDataItems
+	// var labresp prolabs.ProlabsData.
 	task := format.Task(func(a any) any {
 		if client, ok := a.(*HTB.Client);ok {
 			labs, err := client.Prolabs.List(ctx)
@@ -42,7 +42,7 @@ func SelectProlabs(HTBClient *HTB.Client) (selectedLab int) {
 	if !ok {
 		panic("Error checking typing for prolabs request")
 	}
-	labresp = labs.Data.Labs
+	labresp := labs.Data.Labs
 
 	var options []huh.Option[int]
 	var quit_value = 9999999999999
