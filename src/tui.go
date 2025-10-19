@@ -14,6 +14,7 @@ import (
 	ProlabModel "github.com/Ceald1/HTB-TUI/src/models/prolabs"
 	SherlockModel "github.com/Ceald1/HTB-TUI/src/models/sherlocks"
 	Vpn "github.com/Ceald1/HTB-TUI/src/models/vpn"
+	rankings "github.com/Ceald1/HTB-TUI/src/models/leaderboards"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -66,6 +67,7 @@ func MainMenu(HTBClient *HTB.Client) {
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightGreen).Background(format.BaseBG).Render("View Pro Labs"), "prolabs"), // Pro Labs
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.Blue).Background(format.BaseBG).Render("View Sherlocks"), "sherlocks"), // Sherlocks
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightBlue).Background(format.BaseBG).Render("Download VPN"), "vpn"), // VPN
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextYellow).Background(format.BaseBG).Render("View leaderboards"), "rankings"), // rankings
 
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
 		).Value(&option).Run()
@@ -145,6 +147,13 @@ func MainMenu(HTBClient *HTB.Client) {
 				if err != nil {
 					panic(err)
 				}
+			}
+		
+		case "rankings":
+			var rankingQuit int
+			for rankingQuit != 9999999999999 {
+				ClearTerminal()
+				rankingQuit = rankings.Rankings(HTBClient)
 			}
 
 
