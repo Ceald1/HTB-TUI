@@ -13,7 +13,6 @@ import (
 
 var (
 	ctx = context.Background()
-	op int
 )
 
 func userLeaderBoards(HTBClient *HTB.Client) {
