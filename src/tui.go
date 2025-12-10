@@ -15,6 +15,7 @@ import (
 	SherlockModel "github.com/Ceald1/HTB-TUI/src/models/sherlocks"
 	Vpn "github.com/Ceald1/HTB-TUI/src/models/vpn"
 	rankings "github.com/Ceald1/HTB-TUI/src/models/leaderboards"
+	seasons "github.com/Ceald1/HTB-TUI/src/models/seasons"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -60,6 +61,7 @@ func MainMenu(HTBClient *HTB.Client) {
 	huh.NewSelect[string]().
 		Title(title).
 		Options(
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightGreen).Background(format.BaseBG).Render("Seasonal Box"), "seasons"), // seasons
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextRed).Background(format.BaseBG).Render("Monitor Bloods"), "blood"), // Bloods
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextCyan).Background(format.BaseBG).Render("View All Boxes"), "boxes"), // Boxes
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextYellow).Background(format.BaseBG).Render("View All Challenges"), "challenge"), // Challenges
@@ -74,6 +76,11 @@ func MainMenu(HTBClient *HTB.Client) {
 	
 	
 	switch option{
+		case "seasons":
+			ClearTerminal()
+			seasons.SeasonalMachine(HTBClient)
+
+
 		case "blood":
 			ClearTerminal()
 			BoxBlood(HTBClient)
