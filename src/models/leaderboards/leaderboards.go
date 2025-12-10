@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
 	rank "github.com/gubarz/gohtb/services/rankings"
+	"github.com/Ceald1/HTB-TUI/src/models/users"
 )
 
 var (
@@ -33,17 +34,30 @@ func userLeaderBoards(HTBClient *HTB.Client) {
 	}
 	UserResponseItems := format.TaskResult.(rank.UserRankingsResponse).Data
 	for _, user := range UserResponseItems {
+		
 		row := TableDataRow{
 			Name: user.Name,
 			Num: lipgloss.NewStyle().Foreground(format.LightGreen).Render(fmt.Sprintf("%d",user.Rank)),
 			Bloods: lipgloss.NewStyle().Foreground(format.TextRed).Render(fmt.Sprintf("%d",user.RootBloods + user.UserBloods + user.ChallengeBloods)),
 			Points: lipgloss.NewStyle().Foreground(format.TextYellow).Render(fmt.Sprintf("%d",user.Points)),
+			ID: user.Id,
 		}
 		RankData = append(RankData, row)
 	}
 	err = RunRankTable(RankData)
 	if err != nil {
 		panic(err)
+	}
+	userId := Selected_item
+	// userId, err := users.SearchUser(Selected_item, HTBClient)
+	// if err != nil {
+	// 		panic(err)
+	// }
+	if userId != 0 {
+		err = users.UserForm(userId, HTBClient)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -71,6 +85,7 @@ func teamLeaderBoards(HTBClient *HTB.Client) {
 			Num: lipgloss.NewStyle().Foreground(format.LightGreen).Render(fmt.Sprintf("%d",Team.Rank)),
 			Bloods: lipgloss.NewStyle().Foreground(format.TextRed).Render(fmt.Sprintf("%d",Team.RootBloods + Team.UserBloods + Team.ChallengeBloods)),
 			Points: lipgloss.NewStyle().Foreground(format.TextYellow).Render(fmt.Sprintf("%d",Team.Points)),
+			ID: Team.Id,
 		}
 		RankData = append(RankData, row)
 	}
@@ -103,6 +118,7 @@ func countryLeaderBoards(HTBClient *HTB.Client) {
 			Num: lipgloss.NewStyle().Foreground(format.LightGreen).Render(fmt.Sprintf("%d",Country.Rank)),
 			Bloods: lipgloss.NewStyle().Foreground(format.TextRed).Render(fmt.Sprintf("%d",Country.RootBloods + Country.UserBloods)),
 			Points: lipgloss.NewStyle().Foreground(format.TextYellow).Render(fmt.Sprintf("%d",Country.Points)),
+			ID: 0,
 		}
 		RankData = append(RankData, row)
 	}

@@ -14,6 +14,7 @@ const (
 	ColumnName = "name"
 	ColumnBloods = "bloods"
 	ColumnPoints = "points"
+	ColumnUserID = "ID"
 	fixedVerticalMargin = 4
 
 )
@@ -22,6 +23,7 @@ type TableDataRow struct {
 	Num string
 	Bloods string
 	Points string
+	ID int
 }
 
 type model struct {
@@ -33,6 +35,8 @@ type model struct {
 	verticalMargin    int
 }
 
+var Selected_item int
+
 func genRows(rankItems []TableDataRow) (rows []table.Row) {
 	for _, rankItem := range rankItems {
 		rows = append(rows, table.NewRow(table.RowData{
@@ -40,6 +44,7 @@ func genRows(rankItems []TableDataRow) (rows []table.Row) {
 			ColumnName: rankItem.Name,
 			ColumnBloods: rankItem.Bloods,
 			ColumnPoints: rankItem.Points,
+			ColumnUserID: rankItem.ID,
 		}))
 	}
 	return rows
@@ -50,6 +55,7 @@ func NewModel(rankItems []TableDataRow) model {
 		table.NewFlexColumn(ColumnName, lipgloss.NewStyle().Foreground(format.TextDefault).Render("Name"), 10).WithFiltered(true),
 		table.NewFlexColumn(ColumnBloods, lipgloss.NewStyle().Foreground(format.TextRed).Render("Bloods"), 10).WithFiltered(true),
 		table.NewFlexColumn(ColumnPoints, lipgloss.NewStyle().Foreground(format.TextLightGreen).Render("Points"), 10).WithFiltered(true),
+		table.NewFlexColumn(ColumnUserID, lipgloss.NewStyle().Foreground(format.TextCyan).Render("ID"), 10).WithFiltered(true),
 	}
 	rows := genRows(rankItems)
 
@@ -111,9 +117,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			cmds = append(cmds, tea.Quit)
 
-		// case "enter", "return":
-		// 	SelectedBox = m.Boxes.HighlightedRow().Data[ColumnBoxID].(string)
-		// 	cmds = append(cmds, tea.Quit)
+		case "enter", "return":
+			Selected_item = m.RankingData.HighlightedRow().Data[ColumnUserID].(int)
+			fmt.Println(Selected_item)
+			cmds = append(cmds, tea.Quit)
 		case "esc":
 			m.RankingData.Filtered(false)
 		case "/":
