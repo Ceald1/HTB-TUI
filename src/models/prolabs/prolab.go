@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
+
 	// "strings"
 	"time"
 
@@ -123,7 +125,8 @@ func ViewProLab(HTBClient *HTB.Client, selectedProlab int) {
 
 	description := lipgloss.NewStyle().
 		Render(fmt.Sprintf(
-		"Completed: %.0f%%\nFlags: %s \n ", 
+		"Entries: %s \nCompleted: %.0f%% \nFlags: %s \n ",
+		strings.Join(info.Data.ProlabData.EntryPoints, " "),
 			progress, 
 			// lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(strings.TrimSpace(format.Sanitize(info.Data.Description)), "\n")), 
 			lipgloss.NewStyle().Foreground(format.DarkPurple).Render(flags),

@@ -1,6 +1,6 @@
 # HTB TUI
 
-An alternative to Gubarz's HTB CLI
+An unofficial TUI for interacting with HackTheBox
 
 
 # TUI Demo

@@ -35,8 +35,10 @@ func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) 
 	var flag string
 	boxInfoData := boxInfo.Data
 	boxStatus := lipgloss.NewStyle().Foreground(format.Pink).Render(boxInfoData.InfoStatus)
+	ip := boxInfoData.Ip
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "OS: %s\nDifficulty: %s\nBreach Info: %s",
+    "IP: %s \nOS: %s\nDifficulty: %s\nBreach Info: %s",
+	ip,
     format.CheckOS(boxInfoData.Os),
     format.CheckDiff(boxInfoData.DifficultyText),
     boxStatus,

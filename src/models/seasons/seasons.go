@@ -22,9 +22,11 @@ func SeasonalMachine(HTBClient *HTB.Client) {
 	boxStatus := lipgloss.NewStyle().Foreground(format.Pink).Render(machine.Data.InfoStatus)
 
 	machineHandle := HTBClient.Machines.Machine(machine.Data.Id)
+	ip := machine.Data.Ip
 	var flagInputPlaceholder = lipgloss.NewStyle().Foreground(format.TextBlue).Faint(true).Blink(true).Render("enter flag.. > ")
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "OS: %s\nDifficulty: %s\nBreach Info: %s",
+    "IP: %s \nOS: %s \nDifficulty: %s \nBreach Info: %s",
+	ip,
     format.CheckOS(machine.Data.Os),
     format.CheckDiff(machine.Data.DifficultyText),
     boxStatus,

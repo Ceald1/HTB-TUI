@@ -34,8 +34,10 @@ func ChallengeInfoMenu(ChallengeInfo challenges.InfoResponse, challengeHandle *c
 	var action string
 	var flag string
 	ChallengeInfoData := ChallengeInfo.Data
+	ip := ChallengeInfoData.PlayInfo.Ip
 	var FormInfo = lipgloss.NewStyle().Render(fmt.Sprintf(
-    "Category: %s\nDifficulty: %s\nDescription: %s",
+    "IP: %s \nCategory: %s\nDifficulty: %s\nDescription: %s",
+	ip,
     ChallengeInfoData.CategoryName,
     format.CheckDiff(ChallengeInfoData.Difficulty),
 	lipgloss.NewStyle().Foreground(format.Pink).Render(ChallengeInfoData.Description),

@@ -77,7 +77,8 @@ func ViewFort(HTBClient *HTB.Client, fortressID int){
 	var title = lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Padding(1).Render(format.Sanitize(info.Data.Name))
 	
 	description := lipgloss.NewStyle().Render(fmt.Sprintf(
-		"Company: %s \nCompleted: %.0f%% \nDescription: %s \nPoints: %s \nFlags: %s \n ", 
+		"IP: %s \nCompany: %s \nCompleted: %.0f%% \nDescription: %s \nPoints: %s \nFlags: %s \n ", 
+			info.Data.Ip,
 			lipgloss.NewStyle().Foreground(format.LightBlue).Render(info.Data.Company.Name), 
 			info.Data.ProgressPercent, 
 			lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(format.Sanitize(info.Data.Description), "\n")), 

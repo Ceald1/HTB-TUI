@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
 	rank "github.com/gubarz/gohtb/services/rankings"
-	"github.com/Ceald1/HTB-TUI/src/models/users"
+	users "github.com/Ceald1/HTB-TUI/src/models/social"
 )
 
 var (

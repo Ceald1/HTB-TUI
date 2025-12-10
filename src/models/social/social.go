@@ -1,4 +1,4 @@
-package users
+package social
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
+	"github.com/gubarz/gohtb/services/teams"
 	users "github.com/gubarz/gohtb/services/users"
 )
 var (
@@ -55,4 +56,26 @@ func UserForm(userId int, HTBClient *HTB.Client) (err error) { // display basic 
 
 
 	return
+}
+
+func getTeam(teamId int, HTBClient *HTB.Client) (profile teams.MembersResponse,  err error) {
+	profile, err = HTBClient.Teams.Team(teamId).
+	return
+}
+
+func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
+	profile, err := getTeam(teamId, HTBClient)
+	if err != nil {
+		return err
+	}
+
+	// var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
+    // "Country: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+    // profile.Data.CountryName,
+    // profile.Data.Points,
+    // profile.Data.ChallengeBloods + profile.Data.UserBloods + profile.Data.SystemBloods,
+	// profile.Data.SystemOwns + profile.Data.UserOwns,
+	// 	),
+	// )
+
 }
