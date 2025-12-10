@@ -59,15 +59,15 @@ func UserForm(userId int, HTBClient *HTB.Client) (err error) { // display basic 
 }
 
 func getTeam(teamId int, HTBClient *HTB.Client) (profile teams.MembersResponse,  err error) {
-	profile, err = HTBClient.Teams.Team(teamId).
+	// profile, err = HTBClient.Teams.Team(teamId)
 	return
 }
 
 func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
-	profile, err := getTeam(teamId, HTBClient)
-	if err != nil {
-		return err
-	}
+	// profile, err := getTeam(teamId, HTBClient)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
     // "Country: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
@@ -77,5 +77,5 @@ func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
 	// profile.Data.SystemOwns + profile.Data.UserOwns,
 	// 	),
 	// )
-
+	return
 }
