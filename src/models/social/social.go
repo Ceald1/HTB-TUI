@@ -58,24 +58,72 @@ func UserForm(userId int, HTBClient *HTB.Client) (err error) { // display basic 
 	return
 }
 
-func getTeam(teamId int, HTBClient *HTB.Client) (profile teams.MembersResponse,  err error) {
-	// profile, err = HTBClient.Teams.Team(teamId)
+
+type Teams struct {
+	Info teams.TeamInfoResponse
+	Stats teams.TeamStatsResponse
+	Members teams.MembersResponse
+}
+
+func getTeam(teamId int, HTBClient *HTB.Client) (profile Teams,  err error) {
+	
+	info, err := HTBClient.Teams.Team(teamId).Info(ctx)
+	if err != nil {
+		return
+	}
+	stats, err := HTBClient.Teams.Team(teamId).Stats(ctx)
+	if err != nil {
+		return
+	}
+	members, err := HTBClient.Teams.Team(teamId).Members(ctx)
+	if err != nil {
+		return
+	}
+	profile = Teams{
+		Info: info,
+		Stats: stats,
+		Members: members,
+	}
 	return
 }
 
 func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
-	// profile, err := getTeam(teamId, HTBClient)
-	// if err != nil {
-	// 	return err
-	// }
+	var userId int = 0
+	profile, err := getTeam(teamId, HTBClient)
+	if err != nil {
+		return err
+	}
 
-	// var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    // "Country: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
-    // profile.Data.CountryName,
-    // profile.Data.Points,
-    // profile.Data.ChallengeBloods + profile.Data.UserBloods + profile.Data.SystemBloods,
-	// profile.Data.SystemOwns + profile.Data.UserOwns,
-	// 	),
-	// )
+	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
+    "Country: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+    profile.Info.Data.CountryName,
+    profile.Info.Data.Points,
+    profile.Stats.Data.FirstBloods,
+	profile.Stats.Data.SystemOwns + profile.Stats.Data.UserOwns,
+		),
+	)
+
+	var options []huh.Option[int]
+	for _, user := range profile.Members.Data {
+		options = append(options, huh.NewOption(lipgloss.NewStyle().Foreground(format.NextColor()).Render(user.Name), user.Id))
+	}
+	options = append(options, huh.NewOption(lipgloss.NewStyle().Foreground(format.Red).Render("EXIT!"), -1))
+
+
+	huh.NewForm(
+		huh.NewGroup(
+			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Padding(1).Render(profile.Info.Data.Name)).Description(FormInfo),
+			huh.NewSelect[int]().Options(options...).Value(&userId),
+		),
+	).Run()
+	if userId != -1 {
+		err = UserForm(userId, HTBClient)
+		if err != nil {
+			return
+		}else{
+			err = TeamForm(teamId, HTBClient)
+		}
+	}
+
 	return
 }

@@ -17,6 +17,7 @@ var (
 )
 
 func userLeaderBoards(HTBClient *HTB.Client) {
+	Selected_item = 0
 	var RankData []TableDataRow
 	task := format.Task(func(a any) any {
 		if client, ok := a.(*HTB.Client); ok {
@@ -63,7 +64,9 @@ func userLeaderBoards(HTBClient *HTB.Client) {
 
 
 func teamLeaderBoards(HTBClient *HTB.Client) {
+	Selected_item = 0
 	var RankData []TableDataRow
+	var teamId = 0
 	task := format.Task(func(a any) any {
 		if client, ok := a.(*HTB.Client); ok {
 			rankData, err := client.Rankings.Teams(ctx)
@@ -93,9 +96,18 @@ func teamLeaderBoards(HTBClient *HTB.Client) {
 	if err != nil {
 		panic(err)
 	}
+	teamId = Selected_item
+	if teamId != 0 {
+		err = users.TeamForm(teamId, HTBClient)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 }
 
 func countryLeaderBoards(HTBClient *HTB.Client) {
+	Selected_item = 0
 	var RankData []TableDataRow
 	task := format.Task(func(a any) any {
 		if client, ok := a.(*HTB.Client); ok {
