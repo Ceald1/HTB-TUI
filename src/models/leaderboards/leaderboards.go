@@ -50,10 +50,6 @@ func userLeaderBoards(HTBClient *HTB.Client) {
 		panic(err)
 	}
 	userId := Selected_item
-	// userId, err := users.SearchUser(Selected_item, HTBClient)
-	// if err != nil {
-	// 		panic(err)
-	// }
 	if userId != 0 {
 		err = users.UserForm(userId, HTBClient)
 		if err != nil {
