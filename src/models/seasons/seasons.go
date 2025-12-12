@@ -1,18 +1,19 @@
 package seasons
+
 import (
 	"fmt"
 	"time"
 
 	"context"
-	"github.com/charmbracelet/huh"
 	"github.com/Ceald1/HTB-TUI/src/format"
+	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
 )
+
 var (
 	ctx = context.Background()
 )
-
 
 func SeasonalMachine(HTBClient *HTB.Client) {
 	machine, err := HTBClient.Seasons.ActiveMachine(ctx)
@@ -25,12 +26,12 @@ func SeasonalMachine(HTBClient *HTB.Client) {
 	ip := machine.Data.Ip
 	var flagInputPlaceholder = lipgloss.NewStyle().Foreground(format.TextBlue).Faint(true).Blink(true).Render("enter flag.. > ")
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "IP: %s \nOS: %s \nDifficulty: %s \nBreach Info: %s",
-	ip,
-    format.CheckOS(machine.Data.Os),
-    format.CheckDiff(machine.Data.DifficultyText),
-    boxStatus,
-		),
+		"IP: %s \nOS: %s \nDifficulty: %s \nBreach Info: %s",
+		ip,
+		format.CheckOS(machine.Data.Os),
+		format.CheckDiff(machine.Data.DifficultyText),
+		boxStatus,
+	),
 	)
 	var boxAction string
 	var flag string
@@ -48,75 +49,75 @@ func SeasonalMachine(HTBClient *HTB.Client) {
 					huh.NewOption(lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextPink).Render("Terminate"), "terminate"),
 					huh.NewOption(lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.DarkPurple).Render("Extend"), "extend"),
 					huh.NewOption(lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextDefault).Render("quit"), "quit"),
-					).Value(&boxAction),
+				).Value(&boxAction),
 		),
 	).Run()
 	switch boxAction {
-		default:
-			return
-		case "none":
-			if(flag != "") {
-				resp,  err  := machineHandle.Own(ctx, flag)
-				if err != nil {
-					fmt.Println("unable to submit flag! ", err.Error())
-					time.Sleep( 10 * time.Second)
-					SeasonalMachine(HTBClient)
-				}else {
-					fmt.Println(resp.Data.Message)
-					// time.Sleep( 10 * time.Second )
-					SeasonalMachine(HTBClient)
-				}
-			}else{
-				SeasonalMachine(HTBClient)
-			}
-		case "quit":
-			return
-		
-		
-		case "reset":
-			resp, err := machineHandle.Reset(ctx)
+	default:
+		return
+	case "none":
+		if flag != "" {
+			resp, err := machineHandle.Own(ctx, flag)
 			if err != nil {
-				fmt.Println("unable to reset! ", err.Error())
-				time.Sleep( 10 * time.Second)
+				fmt.Println("unable to submit flag! ", err.Error())
+				time.Sleep(10 * time.Second)
 				SeasonalMachine(HTBClient)
-			}else {
+			} else {
 				fmt.Println(resp.Data.Message)
-					// time.Sleep( 10 * time.Second )
-				SeasonalMachine(HTBClient)
-			}
-		case "spawn":
-			resp, err := machineHandle.Spawn(ctx)
-			if err != nil {
-				fmt.Println("unable to spawn! ", err.Error())
-				time.Sleep( 10 * time.Second)
-				SeasonalMachine(HTBClient)
-			}else {
-				fmt.Println(resp.Data.Message)
-				time.Sleep( 10 * time.Second )
-				SeasonalMachine(HTBClient)
-			}
-		case "terminate":
-			resp, err := machineHandle.Terminate(ctx)
-			if err != nil {
-				fmt.Println("unable to terminate! ", err.Error())
-				time.Sleep( 10 * time.Second)
-				SeasonalMachine(HTBClient)
-			}else {
-				fmt.Println(resp.Data.Message)
-				return
 				// time.Sleep( 10 * time.Second )
-				// BoxInfoMenu(boxInfo, machineHandle)
-			}
-		case "extend":
-			resp, err := machineHandle.Extend(ctx)
-			if err != nil {
-				fmt.Println("unable to extend! ", err.Error())
-				time.Sleep( 10 * time.Second)
-				SeasonalMachine(HTBClient)
-			}else {
-				fmt.Println(resp.Data.Message)
-				time.Sleep( 10 * time.Second )
 				SeasonalMachine(HTBClient)
 			}
+		} else {
+			SeasonalMachine(HTBClient)
+		}
+	case "quit":
+		return
+
+	case "reset":
+		resp, err := machineHandle.Reset(ctx)
+		if err != nil {
+			fmt.Println("unable to reset! ", err.Error())
+			time.Sleep(10 * time.Second)
+			SeasonalMachine(HTBClient)
+		} else {
+			fmt.Println(resp.Data.Message)
+			// time.Sleep( 10 * time.Second )
+			SeasonalMachine(HTBClient)
+		}
+	case "spawn":
+		resp, err := machineHandle.Spawn(ctx)
+		if err != nil {
+			fmt.Println("unable to spawn! ", err.Error())
+			time.Sleep(10 * time.Second)
+			SeasonalMachine(HTBClient)
+		} else {
+			fmt.Println(resp.Data.Message)
+			// time.Sleep( 10 * time.Second )
+			SeasonalMachine(HTBClient)
+		}
+	case "terminate":
+		resp, err := machineHandle.Terminate(ctx)
+		if err != nil {
+			fmt.Println("unable to terminate! ", err.Error())
+			time.Sleep(10 * time.Second)
+			SeasonalMachine(HTBClient)
+		} else {
+			fmt.Println(resp.Data.Message)
+			return
+			// time.Sleep( 10 * time.Second )
+			// BoxInfoMenu(boxInfo, machineHandle)
+		}
+	case "extend":
+		resp, err := machineHandle.Extend(ctx)
+		if err != nil {
+			fmt.Println("unable to extend! ", err.Error())
+			time.Sleep(10 * time.Second)
+			SeasonalMachine(HTBClient)
+		} else {
+			fmt.Println(resp.Data.Message)
+			// time.Sleep( 10 * time.Second )
+			SeasonalMachine(HTBClient)
+		}
 	}
 }
+
