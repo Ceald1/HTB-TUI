@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
+	"github.com/Ceald1/HTB-TUI/src/format"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
 	HTB "github.com/gubarz/gohtb"
 	"github.com/gubarz/gohtb/services/machines"
-	"github.com/Ceald1/HTB-TUI/src/format"
 )
 
 var (
@@ -44,7 +43,7 @@ type model struct {
 
 
 
-func NewModel(Boxes machineListData) model {
+func NewModel(Boxes machines.MachinesDataItems) model {
 	columns := []table.Column{
 		table.NewColumn(ColumnName, lipgloss.NewStyle().Foreground(format.TextTitle).Render("Name"), 10).WithFiltered(true),
 		table.NewFlexColumn(ColumnOS, lipgloss.NewStyle().Foreground(format.TextTitle).Render("OS"), 1).WithFiltered(true),
@@ -89,16 +88,16 @@ func (m *model) updateFooter() {
 	m.Boxes = m.Boxes.WithStaticFooter(footerText)
 }
 
-type machineListData machines.MachinesDataItems
+// type machineListData machines.MachinesDataItems
 
-func getBoxes(HTBClient *HTB.Client) (machineList machineListData) {
-	machines, err := HTBClient.Machines.List().Ascending().AllResults(ctx)
+func getBoxes(HTBClient *HTB.Client) (machineList machines.MachinesDataItems) {
+	machines, err := HTBClient.Machines.List().AllResults(ctx)
 	if err != nil {
 		fmt.Println("cannot fetch machines!")
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	machineList = machineListData(machines.Data)
+	machineList = machines.Data
 
 
 	return
@@ -106,7 +105,7 @@ func getBoxes(HTBClient *HTB.Client) (machineList machineListData) {
 
 
 
-func genRows(boxes machineListData) (rows []table.Row) {
+func genRows(boxes machines.MachinesDataItems) (rows []table.Row) {
 
 
 
@@ -203,7 +202,7 @@ func Run(HTBClient *HTB.Client) string {
 	if err != nil {
 		panic(err)
 	}
-	boxes, ok := format.TaskResult.(machineListData)
+	boxes, ok := format.TaskResult.(machines.MachinesDataItems)
 	if !ok {
 		panic("error checking task result for machines!")
 	}
