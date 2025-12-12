@@ -114,7 +114,7 @@ func genRows(boxes machines.MachinesDataItems) (rows []table.Row) {
 			ColumnName:     box.Name,
 			ColumnOS:       format.CheckOS(box.Os),
 			ColumnDifficulty: format.CheckDiff(box.DifficultyText),
-			ColumnStatus:   lipgloss.NewStyle().Foreground(format.TextPink).Render(box.State),
+			ColumnStatus:   format.BoxState(box.State),
 			ColumnBoxID:    fmt.Sprintf("%d", box.Id),
 		}))
 	}

@@ -106,7 +106,7 @@ func genRows(boxes listData) (rows []table.Row) {
 			ColumnName:     box.Name,
 			ColumnCategory:       lipgloss.NewStyle().Foreground(format.TextDefault).Render(box.CategoryName),
 			ColumnDifficulty: format.CheckDiff(box.Difficulty),
-			ColumnStatus:   lipgloss.NewStyle().Foreground(format.TextLightGreen).Render("active"),
+			ColumnStatus:   format.BoxState(box.State),
 			ColumnBoxID:    fmt.Sprintf("%d", box.Id),
 		}))
 	}

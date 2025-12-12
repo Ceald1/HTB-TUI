@@ -160,7 +160,22 @@ func CheckDiff(difficulty string) (color string) {
 // 	return
 // }
 
-
+func BoxState(state string) (color string) {
+	state = strings.ToLower(state)
+	switch state {
+		case "free","active":
+			color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(state)
+		case "retired_free":
+			color = lipgloss.NewStyle().Foreground(TextYellow).Render(state)
+		case "retired":
+			color = lipgloss.NewStyle().Foreground(TextPink).Render(state)
+		case "unreleased":
+			color = lipgloss.NewStyle().Foreground(TextPurple).Render(state)
+		default:
+			color = lipgloss.NewStyle().Foreground(TextDefault).Render(state)
+	}
+	return
+}
 
 
 type Task func(any) any
