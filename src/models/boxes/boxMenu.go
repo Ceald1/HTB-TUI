@@ -40,34 +40,9 @@ type model struct {
 	verticalMargin    int
 }
 
-type machineListData struct {
-	Active     machines.MachineDataItems
-	Retired    machines.MachineDataItems
-	Unreleased machines.UnreleasedDataItems
-}
 
-func getBoxes(HTBClient *HTB.Client) (machineList machineListData) {
-	activeMachines, err := HTBClient.Machines.ListActive().AllResults(ctx)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	retiredMachines, err := HTBClient.Machines.ListRetired().AllResults(ctx)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	unreleased, err := HTBClient.Machines.ListUnreleased().AllResults(ctx)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
 
-	machineList.Active = activeMachines.Data
-	machineList.Retired = retiredMachines.Data
-	machineList.Unreleased = unreleased.Data
-	return machineList
-}
+
 
 func NewModel(Boxes machineListData) model {
 	columns := []table.Column{
@@ -114,31 +89,33 @@ func (m *model) updateFooter() {
 	m.Boxes = m.Boxes.WithStaticFooter(footerText)
 }
 
+type machineListData machines.MachinesDataItems
+
+func getBoxes(HTBClient *HTB.Client) (machineList machineListData) {
+	machines, err := HTBClient.Machines.List().Ascending().AllResults(ctx)
+	if err != nil {
+		fmt.Println("cannot fetch machines!")
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	machineList = machineListData(machines.Data)
+
+
+	return
+}
+
+
+
 func genRows(boxes machineListData) (rows []table.Row) {
-	for _, box := range boxes.Active {
-		rows = append(rows, table.NewRow(table.RowData{
+
+
+
+	for _, box := range boxes {
+			rows = append(rows, table.NewRow(table.RowData{
 			ColumnName:     box.Name,
 			ColumnOS:       format.CheckOS(box.Os),
 			ColumnDifficulty: format.CheckDiff(box.DifficultyText),
-			ColumnStatus:   lipgloss.NewStyle().Foreground(format.TextLightGreen).Render("active"),
-			ColumnBoxID:    fmt.Sprintf("%d", box.Id),
-		}))
-	}
-	for _, box := range boxes.Retired {
-		rows = append(rows, table.NewRow(table.RowData{
-			ColumnName:     box.Name,
-			ColumnOS:       format.CheckOS(box.Os),
-			ColumnDifficulty: format.CheckDiff(box.DifficultyText),
-			ColumnStatus:   lipgloss.NewStyle().Foreground(format.Purple).Render("retired"),
-			ColumnBoxID:    fmt.Sprintf("%d", box.Id),
-		}))
-	}
-	for _, box := range boxes.Unreleased {
-		rows = append(rows, table.NewRow(table.RowData{
-			ColumnName:     box.Name,
-			ColumnOS:       format.CheckOS(box.Os),
-			ColumnDifficulty: format.CheckDiff(box.DifficultyText),
-			ColumnStatus:   lipgloss.NewStyle().Foreground(format.TextPink).Render("unreleased"),
+			ColumnStatus:   lipgloss.NewStyle().Foreground(format.TextPink).Render(box.State),
 			ColumnBoxID:    fmt.Sprintf("%d", box.Id),
 		}))
 	}
