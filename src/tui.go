@@ -11,11 +11,12 @@ import (
 	BoxModel "github.com/Ceald1/HTB-TUI/src/models/boxes"
 	ChallengeModel "github.com/Ceald1/HTB-TUI/src/models/challenges"
 	Fortress "github.com/Ceald1/HTB-TUI/src/models/fortress"
+	rankings "github.com/Ceald1/HTB-TUI/src/models/leaderboards"
 	ProlabModel "github.com/Ceald1/HTB-TUI/src/models/prolabs"
+	searchengine "github.com/Ceald1/HTB-TUI/src/models/searchEngine"
+	seasons "github.com/Ceald1/HTB-TUI/src/models/seasons"
 	SherlockModel "github.com/Ceald1/HTB-TUI/src/models/sherlocks"
 	Vpn "github.com/Ceald1/HTB-TUI/src/models/vpn"
-	rankings "github.com/Ceald1/HTB-TUI/src/models/leaderboards"
-	seasons "github.com/Ceald1/HTB-TUI/src/models/seasons"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
 	"github.com/charmbracelet/huh"
@@ -70,6 +71,7 @@ func MainMenu(HTBClient *HTB.Client) {
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.Blue).Background(format.BaseBG).Render("View Sherlocks"), "sherlocks"), // Sherlocks
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.LightBlue).Background(format.BaseBG).Render("Download VPN"), "vpn"), // VPN
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextYellow).Background(format.BaseBG).Render("View leaderboards"), "rankings"), // rankings
+			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextYellow).Background(format.BaseBG).Render("search"), "search"), // search engine
 
 			huh.NewOption(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Render("Quit"), "quit"), // Quit
 		).Value(&option).Run()
@@ -162,6 +164,10 @@ func MainMenu(HTBClient *HTB.Client) {
 				ClearTerminal()
 				rankingQuit = rankings.Rankings(HTBClient)
 			}
+		
+		case "search":
+			ClearTerminal()
+			searchengine.Run(HTBClient)
 
 
 		

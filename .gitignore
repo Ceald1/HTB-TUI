@@ -5,3 +5,4 @@ HTB-TUI
 test*
 *.ovpn
 *.json
+reference.go
