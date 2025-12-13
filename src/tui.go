@@ -55,6 +55,7 @@ func ClearTerminal() {
 }
 
 func MainMenu(HTBClient *HTB.Client) {
+	ClearTerminal()
 	title := lipgloss.NewStyle().Foreground(format.TextTitle).Padding(1,1,1,1).Background(format.BaseBG).Render(`Main Menu`)
 	var option string
 
