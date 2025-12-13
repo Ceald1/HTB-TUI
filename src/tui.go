@@ -16,6 +16,7 @@ import (
 	searchengine "github.com/Ceald1/HTB-TUI/src/models/searchEngine"
 	seasons "github.com/Ceald1/HTB-TUI/src/models/seasons"
 	SherlockModel "github.com/Ceald1/HTB-TUI/src/models/sherlocks"
+	"github.com/Ceald1/HTB-TUI/src/models/social"
 	Vpn "github.com/Ceald1/HTB-TUI/src/models/vpn"
 
 	"github.com/Ceald1/HTB-TUI/src/format"
@@ -168,6 +169,23 @@ func MainMenu(HTBClient *HTB.Client) {
 		case "search":
 			ClearTerminal()
 			searchengine.Run(HTBClient)
+			Selected := searchengine.ExtractSearchValue()
+			switch Selected.Product{
+			case "challenge":
+				info, handle := ChallengeModel.ChallengeInfo(strconv.Itoa(Selected.Id), HTBClient)
+				ChallengeModel.ChallengeInfoMenu(info, handle)
+			case "box":
+				info, handle := BoxModel.BoxInfo(strconv.Itoa(Selected.Id), HTBClient)
+				BoxModel.BoxInfoMenu(info, handle)
+			case "sherlock":
+				SherlockModel.ViewSherlock(HTBClient, Selected.Id)
+			case "team":
+				social.TeamForm(Selected.Id, HTBClient)
+			case "user":
+				social.UserForm(Selected.Id, HTBClient)
+			default:
+				fmt.Println("nothing selected....")
+			}
 
 
 		

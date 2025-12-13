@@ -285,6 +285,53 @@ func NewModel(HTBClient *HTB.Client) model{
 	return m
 }
 
+type SelectedChoice struct {
+	Product string
+	Id int
+}
+
+
+func ExtractSearchValue() (result SelectedChoice) {
+	choice := SELECTED_ITEM
+	chal, ok := choice.(v4.SearchChallengeItem)
+	if ok {
+		result = SelectedChoice{
+			Product: "challenge",
+			Id: chal.Id,
+		}
+	}
+	box, ok := choice.(v4.SearchFetchMachinesItem)
+	if ok {
+		result = SelectedChoice{
+			Product: "box",
+			Id: box.Id,
+		}
+	}
+	sherlock, ok := choice.(v4.SearchSherlockItem)
+	if ok {
+		result = SelectedChoice{
+			Product: "sherlock",
+			Id: sherlock.Id,
+		}
+	}
+	team, ok := choice.(v4.SearchTeamItem)
+	if ok {
+		result = SelectedChoice{
+			Product: "team",
+			Id: team.Id,
+		}
+	}
+	user, ok := choice.(v4.SearchUserItem)
+	if ok {
+		result = SelectedChoice{
+			Product: "user",
+			Id: user.Id,
+		}
+	}
+	return result
+}
+
+
 
 func Run(HTBClient *HTB.Client){
 	p := tea.NewProgram(NewModel(HTBClient), tea.WithAltScreen())
