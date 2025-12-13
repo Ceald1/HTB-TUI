@@ -102,17 +102,18 @@ func (m *model) updateFooter() {
 
 func genRows(Challenges challengeListData) (rows []table.Row) {
 	for _, Challenge := range Challenges.Challenges {
-		c := strings.ToLower(Challenge.State)
-		var state string
-		switch c {
-			case "active":
-				state = lipgloss.NewStyle().Foreground(format.TextLightGreen).Render("Active")
-			case "retired":
-				state = lipgloss.NewStyle().Foreground(format.TextYellow).Render("Retired")
-			default:
-				state = lipgloss.NewStyle().Foreground(format.Pink).Render("Unreleased")
+		// c := strings.ToLower(Challenge.State)
+		// var state string
+		// switch c {
+		// 	case "active":
+		// 		state = lipgloss.NewStyle().Foreground(format.TextLightGreen).Render("Active")
+		// 	case "retired":
+		// 		state = lipgloss.NewStyle().Foreground(format.TextYellow).Render("Retired")
+		// 	default:
+		// 		state = lipgloss.NewStyle().Foreground(format.Pink).Render("Unreleased")
 			
-		}
+		// }
+		state := format.BoxState(Challenge.State)
 		rows = append(rows, table.NewRow(table.RowData{
 			ColumnName:     Challenge.Name,
 			ColumnCategory:       Challenge.CategoryName,
