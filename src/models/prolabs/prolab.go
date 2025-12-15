@@ -113,6 +113,7 @@ func ViewProLab(HTBClient *HTB.Client, selectedProlab int) {
 	progress := progressResp.Data.Ownership
 
 
+
 	// description := lipgloss.NewStyle().
 	//     Height(calculateTwentyPercentHeight()).
     // 	Width(calculateTwentyPercentWidth()).

@@ -1,14 +1,24 @@
 package format
 
 import (
+	"fmt"
+	"log"
 	"strings"
+
+	"image"
+	_ "image/png"
+	_ "image/jpeg"
+	_ "image/gif"
+	"net/http"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/mosaic"
 	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/term"
+	"github.com/nfnt/resize"
 )
 
 var (
@@ -249,4 +259,47 @@ func SplitResp() (resp string) {
 	width, _, _ := term.GetSize(0)
 	resp = strings.Repeat("-", width - 1)
 	return resp
+}
+
+
+func LoadImage(url string) (out string) {
+	if !strings.Contains(url, "https"){
+		url = fmt.Sprintf("https://htb-mp-prod-public-storage.s3.eu-central-1.amazonaws.com%s",url)
+	}
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Panicf("error getting image: %v", err)
+	}
+	defer resp.Body.Close()
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		log.Panicf("error decoding %s: %v", url,err)
+	}
+	var width, height int
+	width, height, _ = term.GetSize(0)
+	// m := mosaic.New().Height(img.Bounds().Dy()/5).Width(img.Bounds().Dx()/5)
+	// scaled_img := resize.Resize(20, 0, img, resize.Lanczos3)
+	scaled_img := resizeForTopBanner(img, width, height)
+	m := mosaic.New().Height(scaled_img.Bounds().Dy()).Width(scaled_img.Bounds().Dx())
+	return lipgloss.JoinVertical(lipgloss.Right, lipgloss.JoinHorizontal(lipgloss.Center, m.Render(scaled_img)))
+}
+func resizeForTopBanner(img image.Image, termWidth, bannerHeightLines int) image.Image {
+    // For square avatars, use a fixed comfortable size
+    targetColumns := 50  // 25 terminal columns wide
+    
+    bounds := img.Bounds()
+    imageAspectRatio := float64(bounds.Dx()) / float64(bounds.Dy())
+    terminalAspectRatio := 0.5
+    
+    // Calculate height needed to maintain aspect ratio
+    newWidth := uint(targetColumns)
+    newHeight := uint(float64(newWidth) / imageAspectRatio * terminalAspectRatio)
+    
+    // Make sure it fits in the banner height
+    if newHeight > uint(bannerHeightLines*2) {
+        newHeight = uint(bannerHeightLines * 2)
+        newWidth = uint(float64(newHeight) * imageAspectRatio / terminalAspectRatio)
+    }
+    
+    return resize.Resize(newWidth, newHeight, img, resize.Lanczos3)
 }

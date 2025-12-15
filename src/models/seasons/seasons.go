@@ -26,7 +26,8 @@ func SeasonalMachine(HTBClient *HTB.Client) {
 	ip := machine.Data.Ip
 	var flagInputPlaceholder = lipgloss.NewStyle().Foreground(format.TextBlue).Faint(true).Blink(true).Render("enter flag.. > ")
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-		"IP: %s \nOS: %s \nDifficulty: %s \nBreach Info: %s",
+		"%s \nIP: %s \nOS: %s \nDifficulty: %s \nBreach Info: %s",
+		format.LoadImage(machine.Data.Avatar),
 		ip,
 		format.CheckOS(machine.Data.Os),
 		format.CheckDiff(machine.Data.DifficultyText),

@@ -29,7 +29,7 @@ func BoxInfo(box_id string,  HTBClient *HTB.Client) (boxInfo machines.InfoRespon
 
 
 
-func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) {
+func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle, avatarUrl string) {
 
 	var boxAction string
 	var flag string
@@ -37,13 +37,15 @@ func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) 
 	boxStatus := lipgloss.NewStyle().Foreground(format.Pink).Render(boxInfoData.InfoStatus)
 	ip := boxInfoData.Ip
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "IP: %s \nOS: %s\nDifficulty: %s\nBreach Info: %s",
+    "%s \nIP: %s \nOS: %s\nDifficulty: %s\nBreach Info: %s",
+	format.LoadImage(avatarUrl),
 	ip,
     format.CheckOS(boxInfoData.Os),
     format.CheckDiff(boxInfoData.DifficultyText),
     boxStatus,
 		),
 	)
+	// FormInfo = fmt.Sprintf("%s\n%s", format.LoadImage(avatarUrl), FormInfo)
 
 	var flagInputPlaceholder = lipgloss.NewStyle().Foreground(format.TextBlue).Faint(true).Blink(true).Render("enter flag.. > ")
 	huh.NewForm(
@@ -73,14 +75,14 @@ func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) 
 				if err != nil {
 					fmt.Println("unable to submit flag! ", err.Error())
 					time.Sleep( 10 * time.Second)
-					BoxInfoMenu(boxInfo, machineHandle)
+					BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 				}else {
 					fmt.Println(resp.Data.Message)
 					// time.Sleep( 10 * time.Second )
-					BoxInfoMenu(boxInfo, machineHandle)
+					BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 				}
 			}else{
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}
 		case "quit":
 			return
@@ -91,29 +93,29 @@ func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) 
 			if err != nil {
 				fmt.Println("unable to reset! ", err.Error())
 				time.Sleep( 10 * time.Second)
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}else {
 				fmt.Println(resp.Data.Message)
 					// time.Sleep( 10 * time.Second )
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}
 		case "spawn":
 			resp, err := machineHandle.Spawn(ctx)
 			if err != nil {
 				fmt.Println("unable to spawn! ", err.Error())
 				time.Sleep( 10 * time.Second)
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}else {
 				fmt.Println(resp.Data.Message)
 				time.Sleep( 10 * time.Second )
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}
 		case "terminate":
 			resp, err := machineHandle.Terminate(ctx)
 			if err != nil {
 				fmt.Println("unable to terminate! ", err.Error())
 				time.Sleep( 10 * time.Second)
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}else {
 				fmt.Println(resp.Data.Message)
 				return
@@ -125,11 +127,11 @@ func BoxInfoMenu(boxInfo machines.InfoResponse, machineHandle *machines.Handle) 
 			if err != nil {
 				fmt.Println("unable to extend! ", err.Error())
 				time.Sleep( 10 * time.Second)
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}else {
 				fmt.Println(resp.Data.Message)
 				time.Sleep( 10 * time.Second )
-				BoxInfoMenu(boxInfo, machineHandle)
+				BoxInfoMenu(boxInfo, machineHandle, avatarUrl)
 			}
 	}
 }

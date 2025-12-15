@@ -40,7 +40,8 @@ func UserForm(userId int, HTBClient *HTB.Client) (err error) { // display basic 
 		return
 	}
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "Country: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+    "%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+	format.LoadImage(profile.Data.Avatar),
     profile.Data.CountryName,
     profile.Data.Points,
     profile.Data.ChallengeBloods + profile.Data.UserBloods + profile.Data.SystemBloods,
@@ -95,7 +96,8 @@ func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
 	}
 
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "Country: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+    "%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+	format.LoadImage(profile.Info.Data.AvatarUrl),
     profile.Info.Data.CountryName,
     profile.Info.Data.Points,
     profile.Stats.Data.FirstBloods,

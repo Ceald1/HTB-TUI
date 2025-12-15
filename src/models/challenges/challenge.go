@@ -22,7 +22,7 @@ func ChallengeInfo(box_id string,  HTBClient *HTB.Client) (ChallengeInfo challen
 	ChallengeInfo, err = challengeHandle.Info(ctx)
 	
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to fetch info... %v", err))
 	}
 	return ChallengeInfo, challengeHandle
 }

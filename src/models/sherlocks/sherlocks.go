@@ -67,13 +67,16 @@ func SelectSherlock(HTBClient *HTB.Client) (selected int) {
 
 func ViewSherlock(HTBClient *HTB.Client, selected int) {
 	labData := HTBClient.Sherlocks.Sherlock(selected)
-	info, _ := labData.Info(ctx)
+	info, err := labData.Info(ctx)
+	if err != nil {
+		panic(err)
+	}
 	var action string
 	var title = lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Padding(1).Render(info.Data.Name)
 	progressResp, _ := labData.Progress(ctx)
 	progress := float64(progressResp.Data.Progress)
 	description := lipgloss.NewStyle().Render(fmt.Sprintf(
-		"Completed: %.0f%% \nCategory: %s \n ", 
+		"Completed: %.0f%% \nCategory: %s \n", 
 			progress, 
 			lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(strings.TrimSpace(format.Sanitize(info.Data.CategoryName)), "\n")), 
 	))

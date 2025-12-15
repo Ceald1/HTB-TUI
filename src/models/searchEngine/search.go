@@ -288,6 +288,7 @@ func NewModel(HTBClient *HTB.Client) model{
 type SelectedChoice struct {
 	Product string
 	Id int
+	Avatar string
 }
 
 
@@ -305,6 +306,7 @@ func ExtractSearchValue() (result SelectedChoice) {
 		result = SelectedChoice{
 			Product: "box",
 			Id: box.Id,
+			Avatar: box.Avatar,
 		}
 	}
 	sherlock, ok := choice.(v4.SearchSherlockItem)
@@ -312,6 +314,7 @@ func ExtractSearchValue() (result SelectedChoice) {
 		result = SelectedChoice{
 			Product: "sherlock",
 			Id: sherlock.Id,
+			Avatar: sherlock.Avatar,
 		}
 	}
 	team, ok := choice.(v4.SearchTeamItem)
@@ -319,6 +322,7 @@ func ExtractSearchValue() (result SelectedChoice) {
 		result = SelectedChoice{
 			Product: "team",
 			Id: team.Id,
+			Avatar: team.Avatar,
 		}
 	}
 	user, ok := choice.(v4.SearchUserItem)
@@ -326,6 +330,7 @@ func ExtractSearchValue() (result SelectedChoice) {
 		result = SelectedChoice{
 			Product: "user",
 			Id: user.Id,
+			Avatar: user.Avatar,
 		}
 	}
 	return result

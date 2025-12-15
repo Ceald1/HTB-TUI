@@ -55,7 +55,6 @@ func ClearTerminal() {
 }
 
 func MainMenu(HTBClient *HTB.Client) {
-	ClearTerminal()
 	title := lipgloss.NewStyle().Foreground(format.TextTitle).Padding(1,1,1,1).Background(format.BaseBG).Render(`Main Menu`)
 	var option string
 
@@ -98,7 +97,8 @@ func MainMenu(HTBClient *HTB.Client) {
 					break
 				}
 				boxInfo, machineHandle := BoxModel.BoxInfo(box_selected, HTBClient)
-				BoxModel.BoxInfoMenu(boxInfo, machineHandle)
+
+				BoxModel.BoxInfoMenu(boxInfo, machineHandle, boxInfo.Data.Avatar)
 			}
 		case "fortress":
 			var Fortress_selected = 1
@@ -145,7 +145,7 @@ func MainMenu(HTBClient *HTB.Client) {
 					break
 				}
 				sherlock_selected_i, _ = strconv.Atoi(sherlock_selected)
-				SherlockModel.ViewSherlock(HTBClient, sherlock_selected_i)
+				SherlockModel.ViewSherlock(HTBClient, sherlock_selected_i, )
 			}
 		case "vpn":
 			vpn_data := Vpn.SelectVPNLabs(HTBClient)
@@ -177,7 +177,7 @@ func MainMenu(HTBClient *HTB.Client) {
 				ChallengeModel.ChallengeInfoMenu(info, handle)
 			case "box":
 				info, handle := BoxModel.BoxInfo(strconv.Itoa(Selected.Id), HTBClient)
-				BoxModel.BoxInfoMenu(info, handle)
+				BoxModel.BoxInfoMenu(info, handle, Selected.Avatar)
 			case "sherlock":
 				SherlockModel.ViewSherlock(HTBClient, Selected.Id)
 			case "team":
