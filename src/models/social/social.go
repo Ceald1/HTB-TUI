@@ -11,6 +11,7 @@ import (
 	"github.com/gubarz/gohtb/services/teams"
 	users "github.com/gubarz/gohtb/services/users"
 )
+
 var (
 	ctx = context.Background()
 )
@@ -29,7 +30,7 @@ func SearchUser(userName string, HTBClient *HTB.Client) (userID int, err error) 
 	return 0, fmt.Errorf("user does not exist!")
 }
 
-func getUser(userId int, HTBClient  *HTB.Client) (profile users.ProfileBasicResponse, err error) {
+func getUser(userId int, HTBClient *HTB.Client) (profile users.ProfileBasicResponse, err error) {
 	profile, err = HTBClient.Users.User(userId).ProfileBasic(ctx)
 	return
 }
@@ -40,34 +41,32 @@ func UserForm(userId int, HTBClient *HTB.Client) (err error) { // display basic 
 		return
 	}
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
-	format.LoadImage(profile.Data.Avatar),
-    profile.Data.CountryName,
-    profile.Data.Points,
-    profile.Data.ChallengeBloods + profile.Data.UserBloods + profile.Data.SystemBloods,
-	profile.Data.SystemOwns + profile.Data.UserOwns,
-		),
+		"%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+		format.LoadImage(profile.Data.Avatar),
+		profile.Data.CountryName,
+		profile.Data.Points,
+		profile.Data.ChallengeBloods+profile.Data.UserBloods+profile.Data.SystemBloods,
+		profile.Data.SystemOwns+profile.Data.UserOwns,
+	),
 	)
 	huh.NewForm(
 		huh.NewGroup(
 			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Padding(1).Render(profile.Data.Name)).Description(FormInfo),
-			huh.NewSelect[string]().Options(huh.NewOption(lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextDefault).Render("quit"),"")),
+			huh.NewSelect[string]().Options(huh.NewOption(lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextDefault).Render("quit"), "")),
 		),
 	).Run()
-
 
 	return
 }
 
-
 type Teams struct {
-	Info teams.TeamInfoResponse
-	Stats teams.TeamStatsResponse
+	Info    teams.TeamInfoResponse
+	Stats   teams.TeamStatsResponse
 	Members teams.MembersResponse
 }
 
-func getTeam(teamId int, HTBClient *HTB.Client) (profile Teams,  err error) {
-	
+func getTeam(teamId int, HTBClient *HTB.Client) (profile Teams, err error) {
+
 	info, err := HTBClient.Teams.Team(teamId).Info(ctx)
 	if err != nil {
 		return
@@ -81,8 +80,8 @@ func getTeam(teamId int, HTBClient *HTB.Client) (profile Teams,  err error) {
 		return
 	}
 	profile = Teams{
-		Info: info,
-		Stats: stats,
+		Info:    info,
+		Stats:   stats,
 		Members: members,
 	}
 	return
@@ -96,13 +95,13 @@ func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
 	}
 
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-    "%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
-	format.LoadImage(profile.Info.Data.AvatarUrl),
-    profile.Info.Data.CountryName,
-    profile.Info.Data.Points,
-    profile.Stats.Data.FirstBloods,
-	profile.Stats.Data.SystemOwns + profile.Stats.Data.UserOwns,
-		),
+		"%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+		format.LoadImage(profile.Info.Data.AvatarUrl),
+		profile.Info.Data.CountryName,
+		profile.Info.Data.Points,
+		profile.Stats.Data.FirstBloods,
+		profile.Stats.Data.SystemOwns+profile.Stats.Data.UserOwns,
+	),
 	)
 
 	var options []huh.Option[int]
@@ -111,18 +110,17 @@ func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
 	}
 	options = append(options, huh.NewOption(lipgloss.NewStyle().Foreground(format.Red).Render("EXIT!"), -1))
 
-
 	huh.NewForm(
 		huh.NewGroup(
 			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Padding(1).Render(profile.Info.Data.Name)).Description(FormInfo),
 			huh.NewSelect[int]().Options(options...).Value(&userId),
-		),
+		).WithHeight(10),
 	).Run()
 	if userId != -1 {
 		err = UserForm(userId, HTBClient)
 		if err != nil {
 			return
-		}else{
+		} else {
 			err = TeamForm(teamId, HTBClient)
 		}
 	}
