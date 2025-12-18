@@ -14,16 +14,15 @@ import (
 	"github.com/gubarz/gohtb/services/sherlocks"
 )
 
-
 var (
-	ctx = context.Background()
+	ctx         = context.Background()
 	LabSelected int
 )
 
 func SelectSherlock(HTBClient *HTB.Client) (selected int) {
 	var sherlock_resp []sherlocks.SherlockItem
 	task := format.Task(func(a any) any {
-		if client, ok := a.(*HTB.Client);ok {
+		if client, ok := a.(*HTB.Client); ok {
 			sherlocks, err := client.Sherlocks.List().AllResults(ctx)
 			if err != nil {
 				panic(err)
@@ -45,7 +44,6 @@ func SelectSherlock(HTBClient *HTB.Client) (selected int) {
 	var quit_value = 9999999999999
 	quit_op := huh.NewOption(lipgloss.NewStyle().Foreground(format.Red).Background(format.BaseBG).Render("Quit"), quit_value)
 	options = append(options, quit_op)
-	
 
 	for _, sherlock := range sherlock_resp {
 		info := lipgloss.NewStyle().Foreground(format.NextColor()).Background(format.BaseBG).Render(sherlock.Name)
@@ -55,12 +53,12 @@ func SelectSherlock(HTBClient *HTB.Client) (selected int) {
 	huh.NewSelect[int]().
 		Title(lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Render("Sherlocks")).
 		Options(options...).Value(&selected).Run()
-	
-	switch selected{
-		case quit_value:
-			return 0
-		default:
-			return selected
+
+	switch selected {
+	case quit_value:
+		return 0
+	default:
+		return selected
 
 	}
 }
@@ -69,16 +67,21 @@ func ViewSherlock(HTBClient *HTB.Client, selected int) {
 	labData := HTBClient.Sherlocks.Sherlock(selected)
 	info, err := labData.Info(ctx)
 	if err != nil {
-		panic(err)
+		v, _ := HTB.AsAPIError(err)
+		if v != nil {
+			panic(fmt.Errorf("API Error: %s (Detail: %s)\n", v.Message, v.Err))
+		}
+		// panic(err)
 	}
 	var action string
 	var title = lipgloss.NewStyle().Foreground(format.TextTitle).Background(format.BaseBG).Padding(1).Render(info.Data.Name)
 	progressResp, _ := labData.Progress(ctx)
 	progress := float64(progressResp.Data.Progress)
 	description := lipgloss.NewStyle().Render(fmt.Sprintf(
-		"Completed: %.0f%% \nCategory: %s \n", 
-			progress, 
-			lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(strings.TrimSpace(format.Sanitize(info.Data.CategoryName)), "\n")), 
+		"%s \nCompleted: %.0f%% \nCategory: %s \n",
+		format.LoadImage(info.Data.Avatar),
+		progress,
+		lipgloss.NewStyle().Foreground(format.Pink).Render(strings.TrimSuffix(strings.TrimSpace(format.Sanitize(info.Data.CategoryName)), "\n")),
 	))
 	huh.NewForm(
 		huh.NewGroup(
@@ -91,12 +94,12 @@ func ViewSherlock(HTBClient *HTB.Client, selected int) {
 				).Value(&action),
 		),
 	).Run()
-		switch action {
-		default:
-			return
-		case "quit":
-			return
-		
+	switch action {
+	default:
+		return
+	case "quit":
+		return
+
 	}
 
 }

@@ -114,7 +114,7 @@ func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
 		huh.NewGroup(
 			huh.NewNote().Title(lipgloss.NewStyle().Foreground(format.TextDefault).Background(format.BaseBG).Padding(1).Render(profile.Info.Data.Name)).Description(FormInfo),
 			huh.NewSelect[int]().Options(options...).Value(&userId),
-		).WithHeight(10),
+		).WithHeight(10).WithShowHelp(true),
 	).Run()
 	if userId != -1 {
 		err = UserForm(userId, HTBClient)
