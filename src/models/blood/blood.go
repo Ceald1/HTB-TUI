@@ -70,7 +70,7 @@ func (m model) Init() tea.Cmd {
 // Returns (machine, error)
 func SeasonalMachine(client *HTB.Client) (machine machines.MachinesData, err error) {
 	ctx := context.Background()
-	machines, err := client.Machines.List().First(ctx)
+	machines, err := client.Machines.List().PerPage(1).Page(0).First(ctx)
 	
 	if err != nil {
 		return machine, fmt.Errorf("error getting current machine! %w", err)
