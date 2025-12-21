@@ -9,7 +9,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/x/mosaic v0.0.0-20251212161403-a3028fabe6bc
 	github.com/evertras/bubble-table v0.17.2
-	github.com/gubarz/gohtb v0.1.4
+	github.com/gubarz/gohtb v0.1.5
 	github.com/kopoli/go-terminal-size v0.0.0-20170219200355-5c97524c8b54
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
