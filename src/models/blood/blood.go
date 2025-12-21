@@ -11,8 +11,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
-	"github.com/gubarz/gohtb/services/seasons"
+	"github.com/gubarz/gohtb/services/machines"
+	// "github.com/gubarz/gohtb/services/seasons"
 )
+var avatar string
 
 type errMsg error
 
@@ -20,6 +22,8 @@ type bloodMsg struct {
 	User string
 	Root string
 	Err  error
+	MachineName string
+	MachineAvatar string
 }
 
 type model struct {
@@ -28,12 +32,14 @@ type model struct {
 	err          error
 	MachineBlood Blood
 	HTBClient    HTB.Client
-	Machine      seasons.ActiveMachineResponse
+	Machine      machines.MachinesData
 }
 
 type Blood struct {
 	User string
 	Root string
+	MachineName string
+	MachineAvatar string
 }
 
 func InitialModel(HTBClient *HTB.Client) model {
@@ -62,24 +68,26 @@ func (m model) Init() tea.Cmd {
 }
 
 // Returns (machine, error)
-func SeasonalMachine(client *HTB.Client) (seasons.ActiveMachineResponse, error) {
+func SeasonalMachine(client *HTB.Client) (machine machines.MachinesData, err error) {
 	ctx := context.Background()
-	machine, err := client.Seasons.ActiveMachine(ctx)
+	machines, err := client.Machines.List().First(ctx)
+	
 	if err != nil {
 		return machine, fmt.Errorf("error getting current machine! %w", err)
 	}
+	machine = machines.Data[0]
 	// Defensive: check machine.Data.Id (assuming Id is int, zero means invalid)
-	if machine.Data.Id == 0 {
+	if machine.Id == 0 {
 		return machine, fmt.Errorf("active machine Data.Id is zero")
 	}
 	return machine, nil
 }
 
-func bloodTaskCmd(client *HTB.Client, machine seasons.ActiveMachineResponse) tea.Cmd {
+func bloodTaskCmd(client *HTB.Client, machine machines.MachinesData) tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
 
-		machineID := machine.Data.Id
+		machineID := machine.Id
 
 		activeMachineInfo := client.Machines.Machine(machineID)
 
@@ -106,7 +114,7 @@ func bloodTaskCmd(client *HTB.Client, machine seasons.ActiveMachineResponse) tea
 			root = machineInfo.Data.RootBlood.User.Name
 		}
 
-		return bloodMsg{User: user, Root: root}
+		return bloodMsg{User: user, Root: root, MachineName: machineInfo.Data.Name, MachineAvatar: machineInfo.Data.Avatar}
 	}
 }
 
@@ -133,6 +141,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.MachineBlood.User = msg.User
 		m.MachineBlood.Root = msg.Root
+		m.MachineBlood.MachineName = msg.MachineName
+		m.MachineBlood.MachineAvatar = msg.MachineAvatar
 		if len(msg.User) != 0 && len(msg.Root) != 0 {
 			m.quit = true
 			return m, tea.Quit
@@ -158,8 +168,17 @@ func (m model) View() string {
 		return m.err.Error()
 	}
 	var str string
+	if m.MachineBlood.MachineAvatar != "" {
+		avatar = format.LoadImage(m.MachineBlood.MachineAvatar)
+	}else{
+		avatar = "no avatar"
+	}
 	redStyle := lipgloss.NewStyle().Foreground(format.Red)
-	str = redStyle.Render(fmt.Sprintf("\n\n   %s Awaiting Bloods...press q to quit\n\n user: %s\n\n root: %s", m.spinner.View(), m.MachineBlood.User, m.MachineBlood.Root))
+	str = fmt.Sprintf("%s%s%s",
+		fmt.Sprintf("%s\n", avatar),
+		fmt.Sprintf("%s\n", lipgloss.NewStyle().Foreground(format.TextYellow).Render(m.MachineBlood.MachineName)),
+		redStyle.Render(fmt.Sprintf("\n\n   %s Awaiting Bloods...press q to quit\n\n user: %s\n\n root: %s", m.spinner.View(), m.MachineBlood.User, m.MachineBlood.Root)),
+	)
 
 	if m.quit {
 		return str + "\n"
