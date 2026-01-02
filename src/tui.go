@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+    "strings"
 
 	BloodModel "github.com/Ceald1/HTB-TUI/src/models/blood"
 	BoxModel "github.com/Ceald1/HTB-TUI/src/models/boxes"
@@ -30,6 +31,13 @@ func API_Token() (instance *HTB.Client, err error){
 	
 	// creating HTB instance and set token
 	token := os.Getenv("HTB_TOKEN")
+    
+	if len(token) <= 1 {
+        if fileContent, err := os.ReadFile(".env"); err == nil {
+            token = strings.TrimSpace(string(fileContent))
+        }
+    }
+
 	if len(token) > 1 {
 		instance, err = HTB.New(token)
 		return
