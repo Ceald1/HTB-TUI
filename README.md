@@ -23,3 +23,5 @@ An unofficial TUI for interacting with HackTheBox
 
 ![](yaml.gif)
 
+# Contribution
+* Please only use the "dev" branch for pull requests that you wish to merge for proper auditing and editing.
