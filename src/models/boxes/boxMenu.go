@@ -91,13 +91,23 @@ func (m *model) updateFooter() {
 // type machineListData machines.MachinesDataItems
 
 func getBoxes(HTBClient *HTB.Client) (machineList machines.MachinesDataItems) {
+	unreleased, err := HTBClient.Machines.List().ByState("unreleased").AllResults(ctx)
+	
+	if err != nil {
+		fmt.Println("cannot fetch machines!")
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	machineList = append(machineList, unreleased.Data...)
+
 	machines, err := HTBClient.Machines.List().AllResults(ctx)
 	if err != nil {
 		fmt.Println("cannot fetch machines!")
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	machineList = machines.Data
+	machineList = append(machineList, machines.Data...)
+	
 
 
 	return
