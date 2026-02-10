@@ -19,7 +19,6 @@ var (
 	ctx = context.Background()
 )
 
-
 type Config struct {
 	Global  GlobalSection `yaml:"global"`
 	Actions []Action      `yaml:"action"`
@@ -32,10 +31,8 @@ type Action struct {
 	Type string
 	Data any
 }
-// TODO: Add VPN downloading support, and pro lab support 
 
-
-
+// TODO: Add VPN downloading support, and pro lab support
 
 func (a *Action) UnmarshalYAML(value *yaml.Node) error {
 	if len(value.Content) != 2 {
@@ -61,8 +58,8 @@ func (a *Action) UnmarshalYAML(value *yaml.Node) error {
 		}
 		a.Type = "info"
 		a.Data = info
-	
-	// VPN 
+
+	// VPN
 	case "vpnDownload":
 		var vpn VPNDownload
 		if err := valNode.Decode(&vpn); err != nil {
@@ -77,26 +74,23 @@ func (a *Action) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-
-
 type FlagSubmit struct {
-	BoxID int `yaml:"boxID"`
-	BoxName string `yaml:"box"`
-	Challenge string `yaml:"challenge"`
-	ChallengeID int `yaml:"challengeID"`
-	Fortress 	string 	`yaml:"fortress"`
-	FortressID 	int 	`yaml:"fortressID"`
-	Flag	string `yaml:"flag"`
+	BoxID       int    `yaml:"boxID"`
+	BoxName     string `yaml:"box"`
+	Challenge   string `yaml:"challenge"`
+	ChallengeID int    `yaml:"challengeID"`
+	Fortress    string `yaml:"fortress"`
+	FortressID  int    `yaml:"fortressID"`
+	Flag        string `yaml:"flag"`
 }
 type Info struct {
-	BoxID int `yaml:"boxID"`
-	BoxName string `yaml:"box"`
-	Challenge string `yaml:"challenge"`
-	ChallengeID int `yaml:"challengeID"`
-	Fortress 	string 	`yaml:"fortress"`
-	FortressID 	int 	`yaml:"fortressID"`	
+	BoxID       int    `yaml:"boxID"`
+	BoxName     string `yaml:"box"`
+	Challenge   string `yaml:"challenge"`
+	ChallengeID int    `yaml:"challengeID"`
+	Fortress    string `yaml:"fortress"`
+	FortressID  int    `yaml:"fortressID"`
 }
-
 
 func RunAutomation(yaml_file string) {
 	var HTBClient *HTB.Client
@@ -122,27 +116,27 @@ func RunAutomation(yaml_file string) {
 		case "vpn":
 			fs := action.Data.(VPNDownload)
 			region := strings.ToUpper(fs.Region)
-			if region == ""{
+			if region == "" {
 				fmt.Println(ErrorText(fmt.Errorf("Region is required!")))
 				break
 			}
 			tier := strings.ToLower(fs.Tier)
-			if tier == ""{
+			if tier == "" {
 				fmt.Println(ErrorText(fmt.Errorf("Tier is required (free, vip, vip+, or unknown)!")))
 				break
 			}
 			typeVpn := strings.ToLower(fs.Type)
-			if typeVpn == ""{
+			if typeVpn == "" {
 				fmt.Println(ErrorText(fmt.Errorf("Type is required (labs, release_arena, endgame, prolab, or fortress)!")))
 				break
 			}
 			outFile := fs.Outfile
-			if outFile == ""{
+			if outFile == "" {
 				fmt.Println(ErrorText(fmt.Errorf("Outfile name is required (don't put .ovpn)!")))
 				break
 			}
 			protocol := strings.ToLower(fs.Protocol)
-			if protocol != "udp" && protocol != "tcp"{
+			if protocol != "udp" && protocol != "tcp" {
 				fmt.Println("invalid protocol found, defaulting to TCP")
 				protocol = "tcp"
 			}
@@ -152,8 +146,6 @@ func RunAutomation(yaml_file string) {
 				return
 			}
 
-
-		
 		case "flagSubmit":
 			fs := action.Data.(FlagSubmit)
 			flag := fs.Flag
@@ -205,7 +197,7 @@ func RunAutomation(yaml_file string) {
 
 			case "challenge":
 				Handle := HTBClient.Challenges.Challenge(ChallengeID)
-				resp, err := Handle.Own(ctx, flag)
+				resp, err := Handle.Own(ctx, flag, 1)
 				if err != nil {
 					fmt.Println(ErrorText(err))
 				} else {
@@ -270,13 +262,12 @@ func RunAutomation(yaml_file string) {
 					fmt.Println(ErrorText(err))
 				} else {
 					data := lipgloss.NewStyle().Render(
-						lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextTitle).Padding(1,1).Render(resp.Data.Name),
+						lipgloss.NewStyle().Background(format.BaseBG).Foreground(format.TextTitle).Padding(1, 1).Render(resp.Data.Name),
 						fmt.Sprintf("\nDifficulty: %s", lipgloss.NewStyle().Render(format.CheckDiff(resp.Data.DifficultyText))),
 						fmt.Sprintf("\nOS: %s", lipgloss.NewStyle().Foreground(format.TextDefault).Render(format.CheckOS(resp.Data.Os))),
 						fmt.Sprintf("\nCredentials: %s:%s", lipgloss.NewStyle().Foreground(format.Pink).Render(resp.Data.Credentials.Username), lipgloss.NewStyle().Foreground(format.Pink).Render(resp.Data.Credentials.Password)),
 					)
-					
-					
+
 					fmt.Println(data)
 				}
 
@@ -321,15 +312,7 @@ func ErrorText(err error) (out string) {
 	return
 }
 
-func SubmissionText(message string) (out string){
+func SubmissionText(message string) (out string) {
 	out = lipgloss.NewStyle().Foreground(format.LightGreen).Render(message)
 	return
 }
-
-
-
-
-
-
-
-
