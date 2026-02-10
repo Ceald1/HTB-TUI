@@ -5,7 +5,7 @@ import (
 	"os"
 
 	SOURCE "github.com/Ceald1/HTB-TUI/src"
-	// YAML "github.com/Ceald1/HTB-TUI/yaml"
+	YAML "github.com/Ceald1/HTB-TUI/yaml"
 )
 
 
@@ -21,11 +21,11 @@ func main(){
 		SOURCE.MainMenu(instance)
 	}else{
 		fmt.Println("running in automation mode....")
+		for i, arg := range args{
+			if arg == "-yaml" && i+1 < len(args) {
+				YAML.RunAutomation(args[i+1])
+			}
+		}
 	}
-	// for _, arg := range args{
-	// 	YAML.RunAutomation(arg)
-	// }
-// TODO: FIX YAML
-	
 
 }

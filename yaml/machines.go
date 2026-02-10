@@ -14,7 +14,7 @@ func GetMachineID(name string, HTBClient HTB.Client) (id int, err error) {
 	format.TaskResult = 0
 	task := format.Task(func(a any) any {
 		HTBClient, _ := a.(*HTB.Client)
-		contents, _ := HTBClient.Machines.ListActive().AllResults(ctx)
+		contents, _ := HTBClient.Machines.List().ByState("active").AllResults(ctx)
 		Response := contents.Data
 		for _, r := range Response {
 			if strings.ToLower(r.Name) == name {
@@ -22,7 +22,7 @@ func GetMachineID(name string, HTBClient HTB.Client) (id int, err error) {
 				return id
 			}
 		}
-		contents, err = HTBClient.Machines.ListRetired().AllResults(ctx)
+		contents, err = HTBClient.Machines.List().ByState("retired").AllResults(ctx)
 
 		Response = contents.Data
 		for _, r := range Response {
@@ -32,7 +32,7 @@ func GetMachineID(name string, HTBClient HTB.Client) (id int, err error) {
 			}
 		}
 
-		contents1, _ := HTBClient.Machines.ListUnreleased().AllResults(ctx)
+		contents1, _ := HTBClient.Machines.List().ByState("unreleased").AllResults(ctx)
 
 		Response1 := contents1.Data
 		for _, r := range Response1 {
