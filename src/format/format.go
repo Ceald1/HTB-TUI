@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"image"
-	_ "image/png"
-	_ "image/jpeg"
 	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"net/http"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -17,14 +17,14 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/mosaic"
 	"github.com/microcosm-cc/bluemonday"
-	"golang.org/x/term"
 	"github.com/nfnt/resize"
+	"golang.org/x/term"
 )
 
 var (
 	// based on https://github.com/silofy/hackthebox/tree/master
 	// Base background color
-	BaseBG  = lipgloss.Color("#141D2B")
+	BaseBG = lipgloss.Color("#141D2B")
 
 	// Primary palette
 	Purple     = lipgloss.Color("#A4B1CD")
@@ -38,17 +38,16 @@ var (
 	DarkPurple = lipgloss.Color("#A000FF")
 
 	// Optional: Text color for dark backgrounds (use primary palette for accents)
-	TextDefault = Purple
-	TextRed     = Red
-	TextCyan    = Cyan
-	TextPink    = Pink
-	TextYellow  = Yellow
-	TextLightBlue = LightBlue
-	TextBlue    = Blue
+	TextDefault    = Purple
+	TextRed        = Red
+	TextCyan       = Cyan
+	TextPink       = Pink
+	TextYellow     = Yellow
+	TextLightBlue  = LightBlue
+	TextBlue       = Blue
 	TextLightGreen = LightGreen
-	TextTitle = LightGreen
-	TextPurple = DarkPurple
-
+	TextTitle      = LightGreen
+	TextPurple     = DarkPurple
 )
 var ColorsBrightToDark = []lipgloss.Color{
 	Yellow,     // #FFCC5C
@@ -63,7 +62,7 @@ var ColorsBrightToDark = []lipgloss.Color{
 }
 var ColorIndex = 0
 
-func HTBTheme()*huh.Theme{
+func HTBTheme() *huh.Theme {
 	t := huh.ThemeBase()
 
 	var (
@@ -114,7 +113,7 @@ func HTBTheme()*huh.Theme{
 	return t
 }
 
-func Sanitize(inputStr string) (string) {
+func Sanitize(inputStr string) string {
 	p := bluemonday.StripTagsPolicy()
 	return p.Sanitize(inputStr)
 }
@@ -129,42 +128,42 @@ func NextColor() lipgloss.Color {
 }
 func CheckOS(BoxOS string) (color string) {
 	BoxOS = strings.ToLower(BoxOS)
-	switch BoxOS{
-		case "linux":
-			color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(BoxOS)
-		case "windows":
-			color = lipgloss.NewStyle().Foreground(TextBlue).Render(BoxOS)
-		case "freebsd":
-			color = lipgloss.NewStyle().Foreground(TextRed).Render(BoxOS)
-		case "openbsd":
-			color = lipgloss.NewStyle().Foreground(TextYellow).Render(BoxOS)
-		case "other":
-			color = lipgloss.NewStyle().Foreground(TextDefault).Render(BoxOS)
+	switch BoxOS {
+	case "linux":
+		color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(BoxOS)
+	case "windows":
+		color = lipgloss.NewStyle().Foreground(TextBlue).Render(BoxOS)
+	case "freebsd":
+		color = lipgloss.NewStyle().Foreground(TextRed).Render(BoxOS)
+	case "openbsd":
+		color = lipgloss.NewStyle().Foreground(TextYellow).Render(BoxOS)
+	case "other":
+		color = lipgloss.NewStyle().Foreground(TextDefault).Render(BoxOS)
 	}
 	return
 }
 func CheckDiff(difficulty string) (color string) {
 	difficulty = strings.ToLower(difficulty)
-	switch difficulty{
-		case "easy":
-			color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(difficulty)
-		case "medium":
-			color = lipgloss.NewStyle().Foreground(TextYellow).Render(difficulty)
-		case "hard":
-			color = lipgloss.NewStyle().Foreground(TextRed).Render(difficulty)
-		case "insane":
-			color = lipgloss.NewStyle().Foreground(TextPurple).Render(difficulty)
-		default:
-			color = lipgloss.NewStyle().Foreground(TextLightBlue).Render(difficulty)
-		
-		
+	switch difficulty {
+	case "easy":
+		color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(difficulty)
+	case "medium":
+		color = lipgloss.NewStyle().Foreground(TextYellow).Render(difficulty)
+	case "hard":
+		color = lipgloss.NewStyle().Foreground(TextRed).Render(difficulty)
+	case "insane":
+		color = lipgloss.NewStyle().Foreground(TextPurple).Render(difficulty)
+	default:
+		color = lipgloss.NewStyle().Foreground(TextLightBlue).Render(difficulty)
+
 	}
 	return
 }
+
 // func CheckCategory(categoryName string) (color string){
 // 	categoryName = strings.ToLower(categoryName)
 // 	switch categoryName{
-// 		case 
+// 		case
 // 	}
 
 // 	return
@@ -173,20 +172,19 @@ func CheckDiff(difficulty string) (color string) {
 func BoxState(state string) (color string) {
 	state = strings.ToLower(state)
 	switch state {
-		case "free","active":
-			color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(state)
-		case "retired_free":
-			color = lipgloss.NewStyle().Foreground(TextYellow).Render(state)
-		case "retired":
-			color = lipgloss.NewStyle().Foreground(TextPink).Render(state)
-		case "unreleased":
-			color = lipgloss.NewStyle().Foreground(TextPurple).Render(state)
-		default:
-			color = lipgloss.NewStyle().Foreground(TextDefault).Render(state)
+	case "free", "active":
+		color = lipgloss.NewStyle().Foreground(TextLightGreen).Render(state)
+	case "retired_free":
+		color = lipgloss.NewStyle().Foreground(TextYellow).Render(state)
+	case "retired":
+		color = lipgloss.NewStyle().Foreground(TextPink).Render(state)
+	case "unreleased":
+		color = lipgloss.NewStyle().Foreground(TextPurple).Render(state)
+	default:
+		color = lipgloss.NewStyle().Foreground(TextDefault).Render(state)
 	}
 	return
 }
-
 
 type Task func(any) any
 
@@ -239,7 +237,7 @@ func (m loading) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.model, cmd = m.model.Update(msg)
 		return m, cmd
 	}
-	return  m, nil
+	return m, nil
 }
 
 func (m loading) View() string {
@@ -257,14 +255,13 @@ func RunLoading(task Task, args any) (err error) {
 
 func SplitResp() (resp string) {
 	width, _, _ := term.GetSize(0)
-	resp = strings.Repeat("-", width - 1)
+	resp = strings.Repeat("-", width-1)
 	return resp
 }
 
-
 func LoadImage(url string) (out string) {
-	if !strings.Contains(url, "https"){
-		url = fmt.Sprintf("https://htb-mp-prod-public-storage.s3.eu-central-1.amazonaws.com%s",url)
+	if !strings.Contains(url, "https") {
+		url = fmt.Sprintf("https://htb-mp-prod-public-storage.s3.eu-central-1.amazonaws.com%s", url)
 	}
 	resp, err := http.Get(url)
 	if err != nil {
@@ -273,7 +270,7 @@ func LoadImage(url string) (out string) {
 	defer resp.Body.Close()
 	img, _, err := image.Decode(resp.Body)
 	if err != nil {
-		log.Panicf("error decoding %s: %v", url,err)
+		log.Panicf("error decoding %s: %v", url, err)
 	}
 	var width, height int
 	width, height, _ = term.GetSize(0)
@@ -284,22 +281,23 @@ func LoadImage(url string) (out string) {
 	return lipgloss.JoinVertical(lipgloss.Right, lipgloss.JoinHorizontal(lipgloss.Center, m.Render(scaled_img)))
 }
 func resizeForTopBanner(img image.Image, termWidth, bannerHeightLines int) image.Image {
-    // For square avatars, use a fixed comfortable size
-    targetColumns := 50  // 25 terminal columns wide
-    
-    bounds := img.Bounds()
-    imageAspectRatio := float64(bounds.Dx()) / float64(bounds.Dy())
-    terminalAspectRatio := 0.5
-    
-    // Calculate height needed to maintain aspect ratio
-    newWidth := uint(targetColumns)
-    newHeight := uint(float64(newWidth) / imageAspectRatio * terminalAspectRatio)
-    
-    // Make sure it fits in the banner height
-    if newHeight > uint(bannerHeightLines*2) {
-        newHeight = uint(bannerHeightLines * 2)
-        newWidth = uint(float64(newHeight) * imageAspectRatio / terminalAspectRatio)
-    }
-    
-    return resize.Resize(newWidth, newHeight, img, resize.Lanczos3)
+	// For square avatars, use a fixed comfortable size
+	targetColumns := 50 // 25 terminal columns wide
+
+	bounds := img.Bounds()
+	imageAspectRatio := float64(bounds.Dx()) / float64(bounds.Dy())
+	terminalAspectRatio := 0.5
+
+	// Calculate height needed to maintain aspect ratio
+	newWidth := uint(targetColumns)
+	newHeight := uint(float64(newWidth) / imageAspectRatio * terminalAspectRatio)
+
+	// Make sure it fits in the banner height
+	if newHeight > uint(bannerHeightLines*2) {
+		newHeight = uint(bannerHeightLines * 2)
+		newWidth = uint(float64(newHeight) * imageAspectRatio / terminalAspectRatio)
+	}
+
+	return resize.Resize(newWidth, newHeight, img, resize.Lanczos3)
 }
+

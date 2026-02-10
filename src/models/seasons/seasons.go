@@ -15,17 +15,16 @@ var (
 	ctx = context.Background()
 )
 
-
 func SeasonalMachine(HTBClient *HTB.Client) {
 	var err error
-	machines, err := HTBClient.Machines.List().PerPage(1).Page(1).First(ctx)
-	
+	// machines, err := HTBClient.Machines.List().PerPage(1).Page(1).First(ctx)
+	machine, err := HTBClient.Seasons.ActiveMachine(ctx)
 
 	if err != nil {
 		panic(err)
 	}
-	machineID := machines.Data[0].Id
-	machine, _ := HTBClient.Machines.Machine(machineID).Info(ctx)
+	//machineID := machines.Data[0].Id
+	// machine, _ := HTBClient.Machines.Machine(machineID).Info(ctx)
 	boxStatus := lipgloss.NewStyle().Foreground(format.Pink).Render(machine.Data.InfoStatus)
 
 	machineHandle := HTBClient.Machines.Machine(machine.Data.Id)
@@ -127,4 +126,3 @@ func SeasonalMachine(HTBClient *HTB.Client) {
 		}
 	}
 }
-
