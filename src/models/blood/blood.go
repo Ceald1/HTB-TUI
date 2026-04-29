@@ -11,18 +11,20 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
-	"github.com/gubarz/gohtb/services/machines"
+	//	"github.com/gubarz/gohtb/services/machines"
+	"github.com/gubarz/gohtb/services/seasons"
 	// "github.com/gubarz/gohtb/services/seasons"
 )
+
 var avatar string
 
 type errMsg error
 
 type bloodMsg struct {
-	User string
-	Root string
-	Err  error
-	MachineName string
+	User          string
+	Root          string
+	Err           error
+	MachineName   string
 	MachineAvatar string
 }
 
@@ -32,13 +34,13 @@ type model struct {
 	err          error
 	MachineBlood Blood
 	HTBClient    HTB.Client
-	Machine      machines.MachinesData
+	Machine      seasons.SeasonActiveData
 }
 
 type Blood struct {
-	User string
-	Root string
-	MachineName string
+	User          string
+	Root          string
+	MachineName   string
 	MachineAvatar string
 }
 
@@ -46,16 +48,16 @@ func InitialModel(HTBClient *HTB.Client) model {
 	s := spinner.New()
 	custom_spinner := spinner.Spinner{
 		Frames: []string{
-`▁`, `▂`, `▃`, `▄`, `▅`, `▆`, `▇`, `█`, `▇`, `▆`, `▅`, `▄`, `▃`, `▁`,
-},
-FPS: time.Second / 10,
+			`▁`, `▂`, `▃`, `▄`, `▅`, `▆`, `▇`, `█`, `▇`, `▆`, `▅`, `▄`, `▃`, `▁`,
+		},
+		FPS: time.Second / 10,
 	}
 	s.Spinner = custom_spinner
 	return model{spinner: s, HTBClient: *HTBClient}
 }
 
 func (m model) Init() tea.Cmd {
-	machine, err := SeasonalMachine(&m.HTBClient)
+	machine, err := seasonsMachine(&m.HTBClient)
 	if err != nil {
 		m.err = err
 		return m.spinner.Tick
@@ -68,14 +70,14 @@ func (m model) Init() tea.Cmd {
 }
 
 // Returns (machine, error)
-func SeasonalMachine(client *HTB.Client) (machine machines.MachinesData, err error) {
+func seasonsMachine(client *HTB.Client) (machine seasons.SeasonActiveData, err error) {
 	ctx := context.Background()
-	machines, err := client.Machines.List().PerPage(1).Page(0).First(ctx)
-	
+	machines, err := client.Seasons.ActiveMachine(ctx)
+
 	if err != nil {
 		return machine, fmt.Errorf("error getting current machine! %w", err)
 	}
-	machine = machines.Data[0]
+	machine = machines.Data
 	// Defensive: check machine.Data.Id (assuming Id is int, zero means invalid)
 	if machine.Id == 0 {
 		return machine, fmt.Errorf("active machine Data.Id is zero")
@@ -83,7 +85,7 @@ func SeasonalMachine(client *HTB.Client) (machine machines.MachinesData, err err
 	return machine, nil
 }
 
-func bloodTaskCmd(client *HTB.Client, machine machines.MachinesData) tea.Cmd {
+func bloodTaskCmd(client *HTB.Client, machine seasons.SeasonActiveData) tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
 
@@ -94,7 +96,7 @@ func bloodTaskCmd(client *HTB.Client, machine machines.MachinesData) tea.Cmd {
 		defer func() {
 			if r := recover(); r != nil {
 				// fmt.Printf("Recovered from panic in activeMachineInfo.Info: %v\n", r)
-				
+
 			}
 		}()
 
@@ -170,7 +172,7 @@ func (m model) View() string {
 	var str string
 	if m.MachineBlood.MachineAvatar != "" {
 		avatar = format.LoadImage(m.MachineBlood.MachineAvatar)
-	}else{
+	} else {
 		avatar = "no avatar"
 	}
 	redStyle := lipgloss.NewStyle().Foreground(format.Red)
@@ -193,3 +195,4 @@ func Run(HTBClient *HTB.Client) (err error) {
 	}
 	return
 }
+

@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	HTB "github.com/gubarz/gohtb"
+	//	"github.com/gubarz/gohtb/services/rankings"
 	"github.com/gubarz/gohtb/services/teams"
 	users "github.com/gubarz/gohtb/services/users"
 )
@@ -60,8 +61,8 @@ func UserForm(userId int, HTBClient *HTB.Client) (err error) { // display basic 
 }
 
 type Teams struct {
-	Info    teams.TeamInfoResponse
-	Stats   teams.TeamStatsResponse
+	Info teams.TeamInfoResponse
+	//	Stats   rankings.RankingTeamItem
 	Members teams.MembersResponse
 }
 
@@ -71,17 +72,14 @@ func getTeam(teamId int, HTBClient *HTB.Client) (profile Teams, err error) {
 	if err != nil {
 		return
 	}
-	stats, err := HTBClient.Teams.Team(teamId).Stats(ctx)
-	if err != nil {
-		return
-	}
+
 	members, err := HTBClient.Teams.Team(teamId).Members(ctx)
 	if err != nil {
 		return
 	}
 	profile = Teams{
-		Info:    info,
-		Stats:   stats,
+		Info: info,
+		//		Stats:   stats,
 		Members: members,
 	}
 	return
@@ -95,12 +93,13 @@ func TeamForm(teamId int, HTBClient *HTB.Client) (err error) {
 	}
 
 	var FormInfo = lipgloss.NewStyle().Background(format.BaseBG).Render(fmt.Sprintf(
-		"%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
+		"%s \n Country: %s\nPoints: %d\n",
+		//		"%s \nCountry: %s\nPoints: %d\nBloods: %d\nOwns: %d\n",
 		format.LoadImage(profile.Info.Data.AvatarUrl),
 		profile.Info.Data.CountryName,
 		profile.Info.Data.Points,
-		profile.Stats.Data.FirstBloods,
-		profile.Stats.Data.SystemOwns+profile.Stats.Data.UserOwns,
+		//		profile.Stats.ChallengeBloods+profile.Stats.RootBloods+profile.Stats.UserBloods,
+		//		profile.Stats.RootOwns+profile.Stats.UserOwns,
 	),
 	)
 
