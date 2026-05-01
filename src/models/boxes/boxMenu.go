@@ -3,14 +3,14 @@ package boxes
 import (
 	"context"
 	"fmt"
-	"os"
-	"strings"
 	"github.com/Ceald1/HTB-TUI/src/format"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
 	HTB "github.com/gubarz/gohtb"
 	"github.com/gubarz/gohtb/services/machines"
+	"os"
+	"strings"
 )
 
 var (
@@ -19,11 +19,12 @@ var (
 )
 
 const (
-	ColumnName     = "name"
+	ColumnName       = "name"
 	ColumnDifficulty = "difficulty"
-	ColumnOS       = "os"
-	ColumnStatus   = "status"
-	ColumnBoxID    = "id"
+	ColumnOS         = "os"
+	ColumnStatus     = "status"
+	ColumnBoxID      = "id"
+	ColumnPwned      = "pwned"
 
 	minWidth            = 30
 	minHeight           = 8
@@ -31,17 +32,13 @@ const (
 )
 
 type model struct {
-	Boxes             table.Model
-	Selected          string
-	totalWidth        int
-	totalHeight       int
-	horizontalMargin  int
-	verticalMargin    int
+	Boxes            table.Model
+	Selected         string
+	totalWidth       int
+	totalHeight      int
+	horizontalMargin int
+	verticalMargin   int
 }
-
-
-
-
 
 func NewModel(Boxes machines.MachinesDataItems) model {
 	columns := []table.Column{
@@ -50,6 +47,7 @@ func NewModel(Boxes machines.MachinesDataItems) model {
 		table.NewFlexColumn(ColumnDifficulty, lipgloss.NewStyle().Foreground(format.TextTitle).Render("Difficulty"), 1).WithFiltered(true),
 		table.NewFlexColumn(ColumnStatus, lipgloss.NewStyle().Foreground(format.TextTitle).Render("Box Status"), 1).WithFiltered(true),
 		table.NewFlexColumn(ColumnBoxID, lipgloss.NewStyle().Foreground(format.TextTitle).Render("Box ID"), 1).WithFiltered(true),
+		table.NewFlexColumn(ColumnPwned, lipgloss.NewStyle().Foreground(format.TextTitle).Render("Pwned"), 1).WithFiltered(true),
 	}
 
 	rows := genRows(Boxes)
@@ -92,7 +90,7 @@ func (m *model) updateFooter() {
 
 func getBoxes(HTBClient *HTB.Client) (machineList machines.MachinesDataItems) {
 	unreleased, err := HTBClient.Machines.List().ByState("unreleased").AllResults(ctx)
-	
+
 	if err != nil {
 		fmt.Println("cannot fetch machines!")
 		fmt.Println(err.Error())
@@ -107,25 +105,33 @@ func getBoxes(HTBClient *HTB.Client) (machineList machines.MachinesDataItems) {
 		os.Exit(1)
 	}
 	machineList = append(machineList, machines.Data...)
-	
-
 
 	return
 }
 
-
+func PwnedStatus(box machines.MachinesData) (pwnedResult string) {
+	if box.AuthUserInRootOwns == true && box.AuthUserInUserOwns == true {
+		return lipgloss.NewStyle().Foreground(format.TextLightGreen).Render("completed")
+	}
+	if box.AuthUserInUserOwns == true {
+		return lipgloss.NewStyle().Foreground(format.TextYellow).Render("user")
+	}
+	if box.AuthUserInRootOwns == true {
+		return lipgloss.NewStyle().Foreground(format.TextRed).Render("root")
+	}
+	return pwnedResult
+}
 
 func genRows(boxes machines.MachinesDataItems) (rows []table.Row) {
 
-
-
 	for _, box := range boxes {
-			rows = append(rows, table.NewRow(table.RowData{
-			ColumnName:     box.Name,
-			ColumnOS:       format.CheckOS(box.Os),
+		rows = append(rows, table.NewRow(table.RowData{
+			ColumnName:       box.Name,
+			ColumnOS:         format.CheckOS(box.Os),
 			ColumnDifficulty: format.CheckDiff(box.DifficultyText),
-			ColumnStatus:   format.BoxState(box.State),
-			ColumnBoxID:    fmt.Sprintf("%d", box.Id),
+			ColumnStatus:     format.BoxState(box.State),
+			ColumnBoxID:      fmt.Sprintf("%d", box.Id),
+			ColumnPwned:      fmt.Sprintf("%s", PwnedStatus(box)),
 		}))
 	}
 	return rows
@@ -183,7 +189,7 @@ func (m model) calculateWidth() int {
 }
 
 func (m model) calculateHeight() int {
-	return m.totalHeight - m.verticalMargin - fixedVerticalMargin 
+	return m.totalHeight - m.verticalMargin - fixedVerticalMargin
 }
 
 func (m model) View() string {
@@ -217,9 +223,7 @@ func Run(HTBClient *HTB.Client) string {
 		panic("error checking task result for machines!")
 	}
 	fmt.Print("\033[H\033[2J")
-	
 
-	
 	p := tea.NewProgram(NewModel(boxes), tea.WithAltScreen())
 
 	// fmt.Println("done fetching boxes!")

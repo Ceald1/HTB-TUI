@@ -7,7 +7,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/huh v1.0.0
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/charmbracelet/x/mosaic v0.0.0-20260429020646-b16bcd101966
+	github.com/charmbracelet/x/mosaic v0.0.0-20260430013151-79116d1f37bd
 	github.com/evertras/bubble-table v0.19.2
 	github.com/gubarz/gohtb v0.3.2
 	github.com/kopoli/go-terminal-size v0.0.0-20170219200355-5c97524c8b54
